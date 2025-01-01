@@ -29,6 +29,7 @@ val OnErrorContainer = Color(0xFF680014)
 
 val Secondary90 = Color(0xFFD9E2FF)
 val Secondary95 = Color(0xFFEEF0FF)
+val FabShadow = Color(0x4D1B6EF3)
 
 internal val ColorScheme = lightColorScheme(
     primary = Primary,
