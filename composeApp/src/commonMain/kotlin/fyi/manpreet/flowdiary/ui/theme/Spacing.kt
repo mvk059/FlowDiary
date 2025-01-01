@@ -18,6 +18,7 @@ data class Spacing(
     val large2XL: Dp = 48.dp,
     val large3XL: Dp = 64.dp,
     val large4XL: Dp = 80.dp,
+    val large5XL: Dp = 100.dp,
 
     val fabContainerWidth: Dp = 56.dp,
     val fabContainerHeight: Dp = 56.dp,
