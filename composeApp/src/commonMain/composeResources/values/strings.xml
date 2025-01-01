@@ -10,6 +10,16 @@
     <string name="home_empty_title">No Entries</string>
     <string name="home_empty_subtitle">Start recording your first Echo </string>
 
+    <string name="chip_all_mood">All Mood</string>
+    <string name="chip_all_topics">All Topics</string>
+
+    <string name="mood_excited">Excited</string>
+    <string name="mood_peaceful">Peaceful</string>
+    <string name="mood_neutral">Neutral</string>
+    <string name="mood_sad">Sad</string>
+    <string name="mood_stressed">Stressed</string>
+
     <string name="settings_cd">Settings</string>
     <string name="fab_cd">Floating Action Button to add an entry</string>
+    <string name="chip_clear_selection_cd">Clear selection</string>
 </resources>
