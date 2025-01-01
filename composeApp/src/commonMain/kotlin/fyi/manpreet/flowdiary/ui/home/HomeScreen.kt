@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import fyi.manpreet.flowdiary.ui.home.components.appbar.HomeTopAppBar
 import fyi.manpreet.flowdiary.ui.home.components.empty.HomeScreenEmpty
+import fyi.manpreet.flowdiary.ui.home.components.fab.HomeFab
 import fyi.manpreet.flowdiary.ui.theme.gradient
 
 @Composable
@@ -21,7 +22,7 @@ fun HomeScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { HomeTopAppBar() },
-        floatingActionButton = {},
+        floatingActionButton = { HomeFab(onFabClick = {}) },
     ) { innerPadding ->
         if (true) {
             HomeScreenEmpty(
