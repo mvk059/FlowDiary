@@ -27,9 +27,8 @@ val OnError = Color(0xFFFFFFFF)
 val ErrorContainer = Color(0xFFFFEDEC)
 val OnErrorContainer = Color(0xFF680014)
 
-val PurpleLight2 = Color(0xFFE0D0FA)
-val PurpleMedium1 = Color(0xFFD0BCFE)
-val PurpleMedium2 = Color(0xFFAD90F1)
+val Secondary90 = Color(0xFFD9E2FF)
+val Secondary95 = Color(0xFFEEF0FF)
 
 internal val ColorScheme = lightColorScheme(
     primary = Primary,
