@@ -96,7 +96,7 @@ fun ChipFilter(
                 ) {
                     val displayText = when {
                         selectedOptions.isEmpty() -> filterOption.title
-                        selectedOptions.size <= 2 -> selectedOptions.joinToString(", ") { it.text }
+                        selectedOptions.size <= 2 -> selectedOptions.joinToString { it.text }
                         else -> {
                             val sortedOptions = selectedOptions.sortedBy { it.text }
                             "${sortedOptions[0].text}, ${sortedOptions[1].text} +${selectedOptions.size - 2}"
@@ -143,49 +143,43 @@ fun ChipFilter(
                         .shadow(elevation = MaterialTheme.spacing.small),
                 ) {
 
-                    LazyColumn(
-                        modifier = Modifier.padding(vertical = MaterialTheme.spacing.small)
-                    ) {
+                    LazyColumn {
                         items(filterOption.options) { option ->
                             val isSelected = selectedOptions.contains(option)
 
                             DropdownMenuItem(
-                                text = {
-                                    Row(
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Row(
-                                            horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.smallMedium),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(option.icon),
-                                                contentDescription = null,
-                                                tint = Color.Unspecified,
-                                            )
-                                            Text(
-                                                text = option.text,
-                                                style = MaterialTheme.typography.labelLarge,
-                                                color = MaterialTheme.colorScheme.secondary
-                                            )
-                                        }
-                                        if (isSelected) {
-                                            Icon(
-                                                Icons.Default.Check,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary
-                                            )
-                                        }
-                                    }
-                                },
-                                onClick = { onOptionSelected(option.id) },
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .padding(horizontal = MaterialTheme.spacing.small, vertical = 1.dp)
                                     .background(
-                                        if (isSelected) MaterialTheme.colorScheme.surfaceVariant
-                                        else Color.Transparent
+                                        color = if (isSelected) MaterialTheme.colorScheme.surfaceVariant
+                                        else Color.Transparent,
+                                        shape = MaterialTheme.shapes.medium,
+                                    ),
+                                onClick = { onOptionSelected(option.id) },
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(option.icon),
+                                        contentDescription = option.text,
+                                        tint = Color.Unspecified,
                                     )
+                                },
+                                text = {
+                                    Text(
+                                        text = option.text,
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                },
+                                trailingIcon = {
+                                    if (isSelected) {
+                                        Icon(
+                                            Icons.Default.Check,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                },
                             )
                         }
                     }
