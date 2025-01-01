@@ -11,4 +11,5 @@
     <string name="home_empty_subtitle">Start recording your first Echo </string>
 
     <string name="settings_cd">Settings</string>
+    <string name="fab_cd">Floating Action Button to add an entry</string>
 </resources>
