@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
         window.requestFeature(Window.FEATURE_NO_TITLE)
         enableEdgeToEdge()
         val insetsController = WindowInsetsControllerCompat(window, window.decorView)
-        insetsController.isAppearanceLightStatusBars = false
+        insetsController.isAppearanceLightStatusBars = true
 
         installSplashScreen()
         setContent {
