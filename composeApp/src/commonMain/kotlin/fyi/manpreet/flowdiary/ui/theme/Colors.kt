@@ -27,6 +27,10 @@ val OnError = Color(0xFFFFFFFF)
 val ErrorContainer = Color(0xFFFFEDEC)
 val OnErrorContainer = Color(0xFF680014)
 
+
+val Primary60 = Color(0xFF578CFF)
+val Primary50 = Color(0xFF1F70F5)
+val Primary40 = Color(0xFF0057CC)
 val Secondary90 = Color(0xFFD9E2FF)
 val Secondary95 = Color(0xFFEEF0FF)
 val FabShadow = Color(0x4D1B6EF3)

@@ -10,13 +10,22 @@ import androidx.compose.ui.graphics.Color
 
 data class Gradients(
     val background: Brush = GradientBackground,
+    val button: Brush = GradientButton,
+    val buttonPressed: Brush = GradientButtonPressed,
 ) {
 
     private companion object {
 
         val GradientBackground = Brush.verticalGradient(
             colors = listOf(Secondary90, Secondary95)
-//            colors = listOf(Color.Red, Color.Cyan)
+        )
+
+        val GradientButton = Brush.verticalGradient(
+            colors = listOf(Primary60, Primary50)
+        )
+
+        val GradientButtonPressed = Brush.verticalGradient(
+            colors = listOf(Primary60, Primary40)
         )
     }
 }
