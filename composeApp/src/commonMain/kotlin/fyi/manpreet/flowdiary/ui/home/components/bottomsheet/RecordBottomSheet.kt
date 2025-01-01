@@ -31,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +44,7 @@ import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.close_cd
 import flowdiary.composeapp.generated.resources.play_cd
 import flowdiary.composeapp.generated.resources.record_bottom_sheet_recording
+import fyi.manpreet.flowdiary.ui.home.components.fab.GradientFAB
 import fyi.manpreet.flowdiary.ui.theme.gradient
 import fyi.manpreet.flowdiary.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
@@ -54,8 +56,10 @@ fun RecordBottomSheet(
     onDismiss: () -> Unit,
 ) {
 
+    val isPlaying = remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
+    // TODO Add to main fab.
     val gradient =
         if (isPressed) MaterialTheme.gradient.buttonPressed
         else MaterialTheme.gradient.button
@@ -113,6 +117,7 @@ fun RecordBottomSheet(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+//                            .heightIn(min = 150.dp)
                             .padding(
                                 horizontal = MaterialTheme.spacing.medium,
                                 vertical = MaterialTheme.spacing.largeXL
@@ -135,24 +140,28 @@ fun RecordBottomSheet(
                             }
                         )
 
-                        IconButton(
-                            modifier = Modifier
-                                .background(brush = MaterialTheme.gradient.button, shape = CircleShape)
-                                .size(MaterialTheme.spacing.large3XL)
-                                .clickable(
-                                    interactionSource = interactionSource,
-                                    indication = null,
-                                    onClick = {},
-                                ),
-                            onClick = {},
-                            content = {
-                                Icon(
-                                    imageVector = Icons.Default.Mic,
-                                    contentDescription = stringResource(Res.string.close_cd), // TODO Change
-                                    tint = MaterialTheme.colorScheme.onPrimary,
-                                )
-                            }
-                        )
+                        if (isPlaying.value) {
+                            GradientFAB { isPlaying.value = false }
+                        } else {
+                            IconButton(
+                                modifier = Modifier
+                                    .background(brush = MaterialTheme.gradient.button, shape = CircleShape)
+                                    .size(MaterialTheme.spacing.large3XL)
+                                    .clickable(
+                                        interactionSource = interactionSource,
+                                        indication = null,
+                                        onClick = {},
+                                    ),
+                                onClick = { isPlaying.value = true },
+                                content = {
+                                    Icon(
+                                        imageVector = Icons.Default.Mic,
+                                        contentDescription = stringResource(Res.string.close_cd), // TODO Change
+                                        tint = MaterialTheme.colorScheme.onPrimary,
+                                    )
+                                }
+                            )
+                        }
 
                         IconButton(
                             modifier = Modifier
