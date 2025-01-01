@@ -9,10 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowInsetsControllerCompat
+import fyi.manpreet.flowdiary.usecase.MainActivityUseCase
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), KoinComponent {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        get<MainActivityUseCase>().setActivity(this)
 
         // Remove the title bar
         window.requestFeature(Window.FEATURE_NO_TITLE)
@@ -25,6 +29,12 @@ class MainActivity : ComponentActivity() {
             App()
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        get<MainActivityUseCase>().setActivity(null)
+    }
+
 }
 
 @Preview
