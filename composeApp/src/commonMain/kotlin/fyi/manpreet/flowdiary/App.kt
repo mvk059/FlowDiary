@@ -7,15 +7,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import fyi.manpreet.flowdiary.navigation.HomeDestination
 import fyi.manpreet.flowdiary.ui.home.HomeScreen
-import fyi.manpreet.flowdiary.ui.home.HomeViewModel
 import fyi.manpreet.flowdiary.ui.theme.FlowTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 @Preview
 fun App(
-    viewModel: HomeViewModel = koinViewModel(),
     navController: NavHostController = rememberNavController(),
 ) {
     FlowTheme {
