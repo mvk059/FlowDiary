@@ -19,7 +19,12 @@
     <string name="mood_sad">Sad</string>
     <string name="mood_stressed">Stressed</string>
 
+    <string name="record_bottom_sheet_recording">Recording your memories...</string>
+
     <string name="settings_cd">Settings</string>
     <string name="fab_cd">Floating Action Button to add an entry</string>
     <string name="chip_clear_selection_cd">Clear selection</string>
+    <string name="close_cd">Stop recording</string>
+    <string name="play_cd">Play recording</string>
+    <string name="pause_cd">Pause recording</string>
 </resources>
