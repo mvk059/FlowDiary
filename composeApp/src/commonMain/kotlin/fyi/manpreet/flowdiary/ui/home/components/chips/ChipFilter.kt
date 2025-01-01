@@ -58,7 +58,7 @@ fun ChipFilter(
 
     var expanded by remember { mutableStateOf(false) }
     val chipBorderColor =
-        if (expanded) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.outlineVariant
+        if (selectedOptions.isNotEmpty()) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.outlineVariant
     val backgroundColor = if (selectedOptions.isNotEmpty()) MaterialTheme.colorScheme.onPrimary else Color.Transparent
 
     var chipSize by remember { mutableStateOf(Size.Zero) }
