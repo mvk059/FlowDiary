@@ -5,6 +5,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 import fyi.manpreet.flowdiary.ui.home.HomeViewModel
+import fyi.manpreet.flowdiary.ui.newrecord.NewRecordViewModel
 
 fun initKoin(config: KoinAppDeclaration? = null) =
     startKoin {
@@ -16,4 +17,5 @@ fun initKoin(config: KoinAppDeclaration? = null) =
 
 val provideViewModelModule = module {
     viewModelOf(::HomeViewModel)
+    viewModelOf(::NewRecordViewModel)
 }
