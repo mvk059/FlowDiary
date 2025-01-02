@@ -19,6 +19,7 @@ data class Spacing(
     val large3XL: Dp = 64.dp,
     val large4XL: Dp = 80.dp,
     val large5XL: Dp = 100.dp,
+    val large6XL: Dp = 120.dp,
 
     val fabContainerWidth: Dp = 56.dp,
     val fabContainerHeight: Dp = 56.dp,
@@ -33,7 +34,9 @@ data class Spacing(
     val bottomBarGapSize: Dp = 100.dp,
 
     // Max Width for mobile but not for bigger size devices
-    val mobileMaxWidthSize: Dp = 500.dp
+    val mobileMaxWidthSize: Dp = 500.dp,
+    // Max height for bottom sheet
+    val bottomSheetMaxHeight: Dp = 1000.dp,
 )
 
 val LocalSpacing = staticCompositionLocalOf { Spacing() }
