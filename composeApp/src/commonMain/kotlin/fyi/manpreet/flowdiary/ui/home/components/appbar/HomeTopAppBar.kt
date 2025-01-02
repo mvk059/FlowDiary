@@ -25,6 +25,7 @@ fun HomeTopAppBar(
 ) {
 
     TopAppBar(
+        modifier = modifier,
         title = {
             Text(
                 text = stringResource(Res.string.home_appbar_title),
