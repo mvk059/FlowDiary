@@ -26,6 +26,8 @@
 
     <string name="new_record_appbar_title">New Entry</string>
     <string name="new_record_add_title">Add Title...</string>
+    <string name="new_record_add_topic">Topic</string>
+    <string name="new_record_add_description">Add Description...</string>
 
     <string name="settings_cd">Settings</string>
     <string name="fab_cd">Floating Action Button to add an entry</string>
@@ -35,4 +37,6 @@
     <string name="pause_cd">Pause recording</string>
     <string name="hashtag_cd">Hashtag</string>
     <string name="new_record_add_icon_cd">Add emotion icon</string>
+    <string name="new_record_add_topic_cd">Add topic icon</string>
+    <string name="new_record_add_description_cd">Add description icon</string>
 </resources>

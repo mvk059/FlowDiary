@@ -75,6 +75,7 @@ fun TitleTextField(
                 color = MaterialTheme.colorScheme.outlineVariant,
             )
         },
+        singleLine = true,
         textStyle = MaterialTheme.typography.headlineLarge,
         colors = TextFieldDefaults.colors().copy(
             focusedIndicatorColor = Color.Transparent,
@@ -84,10 +85,10 @@ fun TitleTextField(
         ),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Done,
+            imeAction = ImeAction.Next,
         ),
-        keyboardActions = KeyboardActions(
-            onDone = { keyboardController?.hide() }
-        )
+//        keyboardActions = KeyboardActions(
+//            onNext = { keyboardController?.hide() }
+//        )
     )
 }
