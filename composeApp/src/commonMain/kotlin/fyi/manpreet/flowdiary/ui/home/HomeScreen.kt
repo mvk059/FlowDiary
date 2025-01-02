@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -12,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.composables.core.ModalBottomSheetState
-import com.composables.core.SheetDetent.Companion.FullyExpanded
 import com.composables.core.SheetDetent.Companion.Hidden
 import com.composables.core.rememberModalBottomSheetState
 import fyi.manpreet.flowdiary.ui.home.components.appbar.HomeTopAppBar
@@ -21,7 +21,8 @@ import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
 import fyi.manpreet.flowdiary.ui.home.components.chips.FilterScreen
 import fyi.manpreet.flowdiary.ui.home.components.empty.HomeScreenEmpty
 import fyi.manpreet.flowdiary.ui.home.components.fab.HomeFab
-import fyi.manpreet.flowdiary.ui.home.components.list.AudioEntryItem
+import fyi.manpreet.flowdiary.ui.home.components.list.AudioEntryContentItem
+import fyi.manpreet.flowdiary.ui.home.components.list.TimelineItem
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.theme.gradient
 import fyi.manpreet.flowdiary.util.Peek
@@ -75,6 +76,8 @@ fun HomeScreenContent(
     onBottomSheetDismiss: () -> Unit,
 ) {
 
+    val list = listOf(1, 2, 3)
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { HomeTopAppBar() },
@@ -82,7 +85,8 @@ fun HomeScreenContent(
     ) { innerPadding ->
         if (false) {
             HomeScreenEmpty(
-                modifier = Modifier.padding(innerPadding).background(brush = MaterialTheme.gradient.background)
+                modifier = Modifier.padding(innerPadding)
+                    .background(brush = MaterialTheme.gradient.background)
             )
             return@Scaffold
         }
@@ -105,8 +109,12 @@ fun HomeScreenContent(
                     )
                 }
 
-                item {
-                    AudioEntryItem()
+                itemsIndexed(list) { index, item ->
+                    TimelineItem(
+                        isLastItem = index == list.lastIndex,
+                    ) { modifier ->
+                        AudioEntryContentItem(modifier)
+                    }
                 }
             }
         }
