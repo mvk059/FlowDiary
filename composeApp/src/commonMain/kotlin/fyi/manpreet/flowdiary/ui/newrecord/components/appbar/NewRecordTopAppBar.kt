@@ -1,9 +1,7 @@
 package fyi.manpreet.flowdiary.ui.newrecord.components.appbar
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -17,7 +15,6 @@ import androidx.compose.ui.graphics.Color
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.new_record_appbar_title
 import flowdiary.composeapp.generated.resources.settings_cd
-import fyi.manpreet.flowdiary.ui.theme.Secondary90
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +37,7 @@ fun NewRecordTopAppBar(
                 onClick = onBackClick,
                 content = {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        imageVector = Icons.Default.ChevronLeft,
                         contentDescription = stringResource(Res.string.settings_cd),
                         tint = Color.Unspecified,
                     )
@@ -48,7 +45,7 @@ fun NewRecordTopAppBar(
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Secondary90
+            containerColor = MaterialTheme.colorScheme.onPrimary
         )
     )
 }
