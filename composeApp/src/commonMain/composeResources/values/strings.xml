@@ -5,6 +5,7 @@
     <string name="common_delete">Delete</string>
     <string name="common_cancel">Cancel</string>
     <string name="common_leave">Leave</string>
+    <string name="common_confirm">Confirm</string>
 
     <string name="home_appbar_title">Your EchoJournal</string>
     <string name="home_empty_title">No Entries</string>
@@ -28,6 +29,7 @@
     <string name="new_record_add_title">Add Title...</string>
     <string name="new_record_add_topic">Topic</string>
     <string name="new_record_add_description">Add Description...</string>
+    <string name="new_record_bottom_sheet_how_doing">How are you doing?</string>
 
     <string name="settings_cd">Settings</string>
     <string name="fab_cd">Floating Action Button to add an entry</string>

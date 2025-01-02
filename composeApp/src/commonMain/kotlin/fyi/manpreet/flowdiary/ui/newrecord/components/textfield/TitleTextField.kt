@@ -38,6 +38,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun TitleTextField(
     modifier: Modifier = Modifier,
+    onFeelingClick: () -> Unit,
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -55,7 +56,7 @@ fun TitleTextField(
         modifier = modifier.fillMaxWidth().focusRequester(focusRequester),
         leadingIcon = {
             IconButton(
-                onClick = {},
+                onClick = onFeelingClick,
                 modifier = Modifier
                     .background(color = Secondary95, shape = CircleShape)
                     .size(MaterialTheme.spacing.largeXL),

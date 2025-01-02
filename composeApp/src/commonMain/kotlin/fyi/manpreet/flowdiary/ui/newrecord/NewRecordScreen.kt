@@ -20,6 +20,7 @@ import flowdiary.composeapp.generated.resources.ic_hashtag
 import flowdiary.composeapp.generated.resources.new_record_add_description
 import flowdiary.composeapp.generated.resources.new_record_add_topic
 import fyi.manpreet.flowdiary.ui.newrecord.components.appbar.NewRecordTopAppBar
+import fyi.manpreet.flowdiary.ui.newrecord.components.bottomsheet.EmotionBottomSheet
 import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.MiniTextField
 import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.TitleTextField
 import fyi.manpreet.flowdiary.ui.theme.spacing
@@ -49,6 +50,8 @@ fun NewRecordScreen(
     NewRecordScreenContent(
         sheetState = sheetState,
         onBackClick = onBackClick,
+        onBottomSheetShow = ::showBottomSheet,
+        onBottomSheetDismiss = ::dismissBottomSheet,
     )
 }
 
@@ -56,6 +59,8 @@ fun NewRecordScreen(
 fun NewRecordScreenContent(
     sheetState: ModalBottomSheetState,
     onBackClick: () -> Unit,
+    onBottomSheetShow: () -> Unit,
+    onBottomSheetDismiss: () -> Unit,
 ) {
 
     Scaffold(
@@ -70,13 +75,16 @@ fun NewRecordScreenContent(
                 .background(color = MaterialTheme.colorScheme.onPrimary),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
         ) {
-            TitleTextField(modifier = Modifier.padding(horizontal = MaterialTheme.spacing.medium))
+            TitleTextField(
+                modifier = Modifier.padding(horizontal = MaterialTheme.spacing.medium),
+                onFeelingClick = onBottomSheetShow
+            )
             MiniTextField(
                 modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large),
                 icon = Res.drawable.ic_hashtag,
                 hintText = Res.string.new_record_add_topic,
 
-            )
+                )
             MiniTextField(
                 modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large),
                 icon = Res.drawable.ic_edit,
@@ -85,4 +93,9 @@ fun NewRecordScreenContent(
             )
         }
     }
+
+    EmotionBottomSheet(
+        sheetState = sheetState,
+        onDismiss = onBottomSheetDismiss
+    )
 }
