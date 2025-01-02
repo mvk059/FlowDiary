@@ -30,7 +30,7 @@ fun TopicChip(
     Row(
         modifier = modifier
             .background(
-                color = MaterialTheme.colorScheme.outlineVariant,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 shape = MaterialTheme.shapes.large,
             )
             .height(FilterChipDefaults.Height)
@@ -47,6 +47,7 @@ fun TopicChip(
 
         Text(
             text = topic,
+            modifier = Modifier.padding(end = MaterialTheme.spacing.extraSmall),
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
