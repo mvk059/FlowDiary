@@ -13,7 +13,9 @@ import com.composables.core.ModalBottomSheetState
 import com.composables.core.SheetDetent.Companion.Hidden
 import com.composables.core.rememberModalBottomSheetState
 import fyi.manpreet.flowdiary.ui.newrecord.components.appbar.NewRecordTopAppBar
+import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.TitleTextField
 import fyi.manpreet.flowdiary.ui.theme.gradient
+import fyi.manpreet.flowdiary.ui.theme.spacing
 import fyi.manpreet.flowdiary.util.Peek
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -55,10 +57,15 @@ fun NewRecordScreenContent(
     ) { innerPadding ->
 
         Box(
-            modifier = Modifier.fillMaxSize().padding(innerPadding)
-                .background(brush = MaterialTheme.gradient.background)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(color = MaterialTheme.colorScheme.onPrimary)
         ) {
 
+            TitleTextField(
+                modifier = Modifier.padding(MaterialTheme.spacing.medium)
+            )
         }
 
     }
