@@ -11,6 +11,7 @@ val InversePrimary = Color(0xFFBAC6E9)
 
 val Secondary = Color(0xFF3B4663)
 val SecondaryContainer = Color(0xFF6B7796)
+val OnSecondaryContainer = Color(0xFFF2F2F7)
 
 val Surface = Color(0xFFFFFFFF)
 val SurfaceVariant = Color(0xFFE1E2EC)
@@ -42,6 +43,7 @@ internal val ColorScheme = lightColorScheme(
     inversePrimary = InversePrimary,
     secondary = Secondary,
     secondaryContainer = SecondaryContainer,
+    onSecondaryContainer = OnSecondaryContainer,
     background = Background,
     surface = Surface,
     surfaceVariant = SurfaceVariant,
