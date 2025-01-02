@@ -21,6 +21,7 @@ import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
 import fyi.manpreet.flowdiary.ui.home.components.chips.FilterScreen
 import fyi.manpreet.flowdiary.ui.home.components.empty.HomeScreenEmpty
 import fyi.manpreet.flowdiary.ui.home.components.fab.HomeFab
+import fyi.manpreet.flowdiary.ui.home.components.list.AudioEntryItem
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.theme.gradient
 import fyi.manpreet.flowdiary.util.Peek
@@ -102,6 +103,10 @@ fun HomeScreenContent(
                         onMoodChipReset = onMoodChipReset,
                         onTopicChipReset = onTopicChipReset,
                     )
+                }
+
+                item {
+                    AudioEntryItem()
                 }
             }
         }
