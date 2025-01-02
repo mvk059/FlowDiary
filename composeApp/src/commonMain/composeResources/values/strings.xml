@@ -30,4 +30,5 @@
     <string name="close_cd">Stop recording</string>
     <string name="play_cd">Play recording</string>
     <string name="pause_cd">Pause recording</string>
+    <string name="hashtag_cd">Hashtag</string>
 </resources>

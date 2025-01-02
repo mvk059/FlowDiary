@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.withStyle
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.list_item_show_less
 import flowdiary.composeapp.generated.resources.list_item_show_more
+import fyi.manpreet.flowdiary.ui.home.components.chips.TopicChip
 import fyi.manpreet.flowdiary.ui.theme.spacing
 import fyi.manpreet.flowdiary.util.noRippleClickable
 import org.jetbrains.compose.resources.stringResource
@@ -77,6 +79,13 @@ fun AudioEntryItem(
             val sampleText =
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tit amet, consectetur adipiscing elit, sed tLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tit amet, consectetur adipiscing elit, sed t"
             ExpandableText(text = sampleText)
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
+            ) {
+                TopicChip(topic = "Work")
+                TopicChip(topic = "Office")
+            }
         }
     }
 }
