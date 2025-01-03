@@ -33,6 +33,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
     navController: NavController,
     onNewRecordClick: () -> Unit,
+    onSettingsClick: () -> Unit,
 ) {
     val moodChip = viewModel.moodChip.collectAsStateWithLifecycle()
     val topicsChip = viewModel.topicsChip.collectAsStateWithLifecycle()
@@ -61,6 +62,7 @@ fun HomeScreen(
         onBottomSheetShow = ::showBottomSheet,
         onBottomSheetDismiss = ::dismissBottomSheet,
         onNewRecordClick = onNewRecordClick,
+        onSettingsClick = onSettingsClick,
     )
 
 }
@@ -77,13 +79,14 @@ fun HomeScreenContent(
     onBottomSheetShow: () -> Unit,
     onBottomSheetDismiss: () -> Unit,
     onNewRecordClick: () -> Unit,
+    onSettingsClick: () -> Unit,
 ) {
 
     val list = listOf(1, 2, 3)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { HomeTopAppBar() },
+        topBar = { HomeTopAppBar(onSettingsClick = onSettingsClick) },
         floatingActionButton = { HomeFab(onFabClick = /*onBottomSheetShow*/onNewRecordClick) },
     ) { innerPadding ->
         if (false) {

@@ -7,3 +7,6 @@ object HomeDestination
 
 @Serializable
 object NewRecordDestination
+
+@Serializable
+object SettingsDestination

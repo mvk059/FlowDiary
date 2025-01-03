@@ -31,6 +31,10 @@
     <string name="new_record_add_description">Add Description...</string>
     <string name="new_record_bottom_sheet_how_doing">How are you doing?</string>
 
+    <string name="settings_appbar_title">Settings</string>
+    <string name="settings_my_mood">My mood</string>
+    <string name="settings_my_mood_subtitle">Select default mood to apply to all new entries</string>
+
     <string name="settings_cd">Settings</string>
     <string name="fab_cd">Floating Action Button to add an entry</string>
     <string name="chip_clear_selection_cd">Clear selection</string>
@@ -38,6 +42,7 @@
     <string name="play_cd">Play recording</string>
     <string name="pause_cd">Pause recording</string>
     <string name="hashtag_cd">Hashtag</string>
+    <string name="new_record_title_cd">New Record Screen</string>
     <string name="new_record_add_icon_cd">Add emotion icon</string>
     <string name="new_record_add_topic_cd">Add topic icon</string>
     <string name="new_record_add_description_cd">Add description icon</string>
