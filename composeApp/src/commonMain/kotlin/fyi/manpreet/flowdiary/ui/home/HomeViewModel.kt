@@ -8,6 +8,7 @@ import flowdiary.composeapp.generated.resources.ic_neutral
 import flowdiary.composeapp.generated.resources.ic_peaceful
 import flowdiary.composeapp.generated.resources.ic_sad
 import flowdiary.composeapp.generated.resources.ic_stressed
+import fyi.manpreet.flowdiary.platform.audio.AudioPlayer
 import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,8 +16,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(
+    private val audioPlayer: AudioPlayer,
+) : ViewModel() {
 
     private val _moodChip = MutableStateFlow<FilterOption?>(null)
     val moodChip = _moodChip
@@ -42,7 +46,14 @@ class HomeViewModel : ViewModel() {
             is HomeEvent.Chip.TopicChip -> onTopicChipSelect(event.id)
             HomeEvent.Chip.MoodReset -> onMoodChipReset()
             HomeEvent.Chip.TopicReset -> onTopicChipReset()
+            HomeEvent.AudioPlayer.Pause -> onAudioPause()
+            HomeEvent.AudioPlayer.Play -> onAudioPlay()
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioPlayer.release()
     }
 
     private fun initMoodChip() {
@@ -107,4 +118,13 @@ class HomeViewModel : ViewModel() {
         _topicsChip.update { it?.copy(options = options) }
     }
 
+    @OptIn(ExperimentalResourceApi::class)
+    private fun onAudioPlay() {
+        val uri = Res.getUri("files/sound.mp3")
+        audioPlayer.play(uri)
+    }
+
+    private fun onAudioPause() {
+        audioPlayer.stop()
+    }
 }
