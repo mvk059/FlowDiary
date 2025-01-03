@@ -15,4 +15,9 @@ sealed interface HomeEvent {
         data object Play : AudioPlayer
         data object Pause : AudioPlayer
     }
+
+    sealed interface Permission : HomeEvent {
+        data class Settings(val type: fyi.manpreet.flowdiary.platform.permission.Permission) : Permission
+        data object Close : Permission
+    }
 }

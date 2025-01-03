@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -21,6 +20,7 @@ import fyi.manpreet.flowdiary.ui.home.components.appbar.HomeTopAppBar
 import fyi.manpreet.flowdiary.ui.home.components.bottomsheet.RecordBottomSheet
 import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
 import fyi.manpreet.flowdiary.ui.home.components.chips.FilterScreen
+import fyi.manpreet.flowdiary.ui.home.components.dialog.PermissionDeniedDialog
 import fyi.manpreet.flowdiary.ui.home.components.empty.HomeScreenEmpty
 import fyi.manpreet.flowdiary.ui.home.components.fab.HomeFab
 import fyi.manpreet.flowdiary.ui.home.components.list.AudioEntryContentItem
@@ -54,10 +54,13 @@ fun HomeScreen(
         sheetState.currentDetent = Peek
     }
 
-    LaunchedEffect(permissionStatus.value) {
-        if (permissionStatus.value == PermissionState.GRANTED) {
-            showBottomSheet()
-        }
+    if (permissionStatus.value == PermissionState.GRANTED) {
+        showBottomSheet()
+    } else if (permissionStatus.value == PermissionState.DENIED) {
+        PermissionDeniedDialog(
+            onSettingsClick = viewModel::onEvent,
+            onDismissRequest = viewModel::onEvent
+        )
     }
 
     HomeScreenContent(

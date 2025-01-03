@@ -66,6 +66,8 @@ class HomeViewModel(
             HomeEvent.RecordAudio -> viewModelScope.launch { checkPermission() }
             HomeEvent.AudioPlayer.Pause -> onAudioPause()
             HomeEvent.AudioPlayer.Play -> onAudioPlay()
+            HomeEvent.Permission.Close -> _permissionStatus.update { PermissionState.NOT_DETERMINED }
+            is HomeEvent.Permission.Settings -> openSettingsPage(event.type)
         }
     }
 
@@ -147,7 +149,7 @@ class HomeViewModel(
     }
 
     private suspend fun checkPermission() {
-        val permissionState = permissionService.checkPermission(Permission.AUDIO)
+        val permissionState = permissionService.checkPermission(Permission.MICROPHONE)
         Logger.i { "Permission state: $permissionState" }
 
         when (permissionState) {
@@ -160,7 +162,7 @@ class HomeViewModel(
     }
 
     private suspend fun provideNotificationsPermission() {
-        permissionService.providePermission(Permission.AUDIO)
+        permissionService.providePermission(Permission.MICROPHONE)
         checkPermission()
     }
 

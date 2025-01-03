@@ -38,6 +38,10 @@
     <string name="settings_my_topics_subtitle">Select default topics to apply to all new entries</string>
     <string name="settings_create_new_topic">Create %1$s</string>
 
+    <string name="permission_denied_title">Permission Denied</string>
+    <string name="permission_denied_message">You cannot record audio journals unless you provide this permission</string>
+    <string name="permission_denied_settings">Go to Settings</string>
+
     <string name="settings_cd">Settings</string>
     <string name="settings_add_icon_cd">Create new topic</string>
     <string name="fab_cd">Floating Action Button to add an entry</string>
