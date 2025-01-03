@@ -2,6 +2,7 @@ package fyi.manpreet.flowdiary.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.ic_excited
 import flowdiary.composeapp.generated.resources.ic_neutral
@@ -9,17 +10,23 @@ import flowdiary.composeapp.generated.resources.ic_peaceful
 import flowdiary.composeapp.generated.resources.ic_sad
 import flowdiary.composeapp.generated.resources.ic_stressed
 import fyi.manpreet.flowdiary.platform.audio.AudioPlayer
+import fyi.manpreet.flowdiary.platform.permission.Permission
+import fyi.manpreet.flowdiary.platform.permission.PermissionState
+import fyi.manpreet.flowdiary.platform.permission.service.PermissionService
 import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 class HomeViewModel(
-    private val audioPlayer: AudioPlayer,
+    private val audioPlayer: AudioPlayer, // TODO Use case
+    private val permissionService: PermissionService,
 ) : ViewModel() {
 
     private val _moodChip = MutableStateFlow<FilterOption?>(null)
@@ -40,12 +47,23 @@ class HomeViewModel(
             initialValue = null
         )
 
+    private val _permissionStatus = MutableStateFlow(PermissionState.NOT_DETERMINED)
+    val permissionStatus: StateFlow<PermissionState> = _permissionStatus
+        .onStart { }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = PermissionState.NOT_DETERMINED
+        )
+
+
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.Chip.MoodChip -> onMoodChipSelect(event.id)
             is HomeEvent.Chip.TopicChip -> onTopicChipSelect(event.id)
             HomeEvent.Chip.MoodReset -> onMoodChipReset()
             HomeEvent.Chip.TopicReset -> onTopicChipReset()
+            HomeEvent.RecordAudio -> viewModelScope.launch { checkPermission() }
             HomeEvent.AudioPlayer.Pause -> onAudioPause()
             HomeEvent.AudioPlayer.Play -> onAudioPlay()
         }
@@ -126,5 +144,27 @@ class HomeViewModel(
 
     private fun onAudioPause() {
         audioPlayer.stop()
+    }
+
+    private suspend fun checkPermission() {
+        val permissionState = permissionService.checkPermission(Permission.AUDIO)
+        Logger.i { "Permission state: $permissionState" }
+
+        when (permissionState) {
+            PermissionState.NOT_DETERMINED -> provideNotificationsPermission()
+            PermissionState.DENIED -> _permissionStatus.update { PermissionState.DENIED }
+            PermissionState.GRANTED -> {
+                _permissionStatus.update { PermissionState.GRANTED }
+            }
+        }
+    }
+
+    private suspend fun provideNotificationsPermission() {
+        permissionService.providePermission(Permission.AUDIO)
+        checkPermission()
+    }
+
+    private fun openSettingsPage(permission: Permission) {
+        permissionService.openSettingsPage(permission)
     }
 }

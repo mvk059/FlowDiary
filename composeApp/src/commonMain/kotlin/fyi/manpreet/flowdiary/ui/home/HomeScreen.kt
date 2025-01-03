@@ -9,12 +9,14 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.composables.core.ModalBottomSheetState
 import com.composables.core.SheetDetent.Companion.Hidden
 import com.composables.core.rememberModalBottomSheetState
+import fyi.manpreet.flowdiary.platform.permission.PermissionState
 import fyi.manpreet.flowdiary.ui.home.components.appbar.HomeTopAppBar
 import fyi.manpreet.flowdiary.ui.home.components.bottomsheet.RecordBottomSheet
 import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
@@ -37,6 +39,7 @@ fun HomeScreen(
 ) {
     val moodChip = viewModel.moodChip.collectAsStateWithLifecycle()
     val topicsChip = viewModel.topicsChip.collectAsStateWithLifecycle()
+    val permissionStatus = viewModel.permissionStatus.collectAsStateWithLifecycle()
 
     val sheetState = rememberModalBottomSheetState(
         initialDetent = Hidden,
@@ -49,6 +52,12 @@ fun HomeScreen(
 
     fun showBottomSheet() {
         sheetState.currentDetent = Peek
+    }
+
+    LaunchedEffect(permissionStatus.value) {
+        if (permissionStatus.value == PermissionState.GRANTED) {
+            showBottomSheet()
+        }
     }
 
     HomeScreenContent(
@@ -77,7 +86,7 @@ fun HomeScreenContent(
     onTopicChipItemSelect: (HomeEvent.Chip) -> Unit,
     onMoodChipReset: (HomeEvent.Chip) -> Unit,
     onTopicChipReset: (HomeEvent.Chip) -> Unit,
-    onAudioEvent: (HomeEvent.AudioPlayer) -> Unit,
+    onAudioEvent: (HomeEvent) -> Unit,
     onBottomSheetShow: () -> Unit,
     onBottomSheetDismiss: () -> Unit,
     onNewRecordClick: () -> Unit,
@@ -89,7 +98,7 @@ fun HomeScreenContent(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { HomeTopAppBar(onSettingsClick = onSettingsClick) },
-        floatingActionButton = { HomeFab(onFabClick = onBottomSheetShow/*onNewRecordClick*/) },
+        floatingActionButton = { HomeFab(onFabClick = onAudioEvent) },
     ) { innerPadding ->
         if (false) {
             HomeScreenEmpty(

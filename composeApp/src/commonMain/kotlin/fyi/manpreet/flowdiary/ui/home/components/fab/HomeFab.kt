@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.fab_cd
+import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.theme.FabShadow
 import fyi.manpreet.flowdiary.ui.theme.gradient
 import fyi.manpreet.flowdiary.ui.theme.spacing
@@ -27,7 +28,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun HomeFab(
     modifier: Modifier = Modifier,
-    onFabClick: () -> Unit,
+    onFabClick: (HomeEvent) -> Unit,
 ) {
 
     val interactionSource = remember { MutableInteractionSource() }
@@ -52,7 +53,7 @@ fun HomeFab(
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
-                onClick = onFabClick,
+                onClick = { onFabClick(HomeEvent.RecordAudio) },
             ),
         contentAlignment = Alignment.Center,
     ) {

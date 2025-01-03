@@ -9,6 +9,8 @@ sealed interface HomeEvent {
         data object TopicReset : Chip
     }
 
+    data object RecordAudio : HomeEvent
+
     sealed interface AudioPlayer : HomeEvent {
         data object Play : AudioPlayer
         data object Pause : AudioPlayer
