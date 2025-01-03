@@ -59,6 +59,7 @@ fun HomeScreen(
         onTopicChipItemSelect = viewModel::onEvent,
         onMoodChipReset = viewModel::onEvent,
         onTopicChipReset = viewModel::onEvent,
+        onAudioEvent = viewModel::onEvent,
         onBottomSheetShow = ::showBottomSheet,
         onBottomSheetDismiss = ::dismissBottomSheet,
         onNewRecordClick = onNewRecordClick,
@@ -76,6 +77,7 @@ fun HomeScreenContent(
     onTopicChipItemSelect: (HomeEvent.Chip) -> Unit,
     onMoodChipReset: (HomeEvent.Chip) -> Unit,
     onTopicChipReset: (HomeEvent.Chip) -> Unit,
+    onAudioEvent: (HomeEvent.AudioPlayer) -> Unit,
     onBottomSheetShow: () -> Unit,
     onBottomSheetDismiss: () -> Unit,
     onNewRecordClick: () -> Unit,
@@ -87,7 +89,7 @@ fun HomeScreenContent(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { HomeTopAppBar(onSettingsClick = onSettingsClick) },
-        floatingActionButton = { HomeFab(onFabClick = /*onBottomSheetShow*/onNewRecordClick) },
+        floatingActionButton = { HomeFab(onFabClick = onBottomSheetShow/*onNewRecordClick*/) },
     ) { innerPadding ->
         if (false) {
             HomeScreenEmpty(
@@ -128,6 +130,7 @@ fun HomeScreenContent(
 
     RecordBottomSheet(
         sheetState = sheetState,
-        onDismiss = onBottomSheetDismiss
+        onDismiss = onBottomSheetDismiss,
+        onAudioEvent = onAudioEvent,
     )
 }

@@ -1,7 +1,5 @@
 package fyi.manpreet.flowdiary.ui.home.state
 
-import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
-
 sealed interface HomeEvent {
 
     sealed interface Chip : HomeEvent {
@@ -9,5 +7,10 @@ sealed interface HomeEvent {
         data class TopicChip(val id: Int) : Chip
         data object MoodReset : Chip
         data object TopicReset : Chip
+    }
+
+    sealed interface AudioPlayer : HomeEvent {
+        data object Play : AudioPlayer
+        data object Pause : AudioPlayer
     }
 }

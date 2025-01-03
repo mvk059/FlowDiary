@@ -35,6 +35,7 @@ import flowdiary.composeapp.generated.resources.close_cd
 import flowdiary.composeapp.generated.resources.play_cd
 import flowdiary.composeapp.generated.resources.record_bottom_sheet_recording
 import fyi.manpreet.flowdiary.ui.home.components.fab.GradientFAB
+import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.theme.spacing
 import org.jetbrains.compose.resources.stringResource
 
@@ -42,6 +43,7 @@ import org.jetbrains.compose.resources.stringResource
 fun RecordBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState,
+    onAudioEvent: (HomeEvent.AudioPlayer) -> Unit,
     onDismiss: () -> Unit,
 ) {
 
@@ -128,12 +130,12 @@ fun RecordBottomSheet(
                         if (isPlaying.value) {
                             GradientFAB(
                                 isPlaying = isPlaying.value,
-                                onClick = { isPlaying.value = false },
+                                onClick = { isPlaying.value = false; onAudioEvent(HomeEvent.AudioPlayer.Pause) },
                             )
                         } else {
                             GradientFAB(
                                 isPlaying = isPlaying.value,
-                                onClick = { isPlaying.value = true },
+                                onClick = { isPlaying.value = true; onAudioEvent(HomeEvent.AudioPlayer.Play) },
                             )
                         }
 
