@@ -6,7 +6,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 actual fun providePermissionsModule() = module {
-    single<PermissionDelegate>(named(Permission.AUDIO.name)) {
+    single<PermissionDelegate>(named(Permission.MICROPHONE.name)) {
         PermissionDelegate(get())
     }
 }

@@ -24,13 +24,13 @@ actual class PermissionDelegate(
     actual suspend fun providePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             mainActivityUseCase.requireActivity().providePermissions(recordAudioPermissions) {
-                throw IllegalStateException("Cannot provide permission: ${Permission.AUDIO.name}")
+                throw IllegalStateException("Cannot provide permission: ${Permission.MICROPHONE.name}")
             }
         }
     }
 
     actual fun openSettingPage() {
-        mainActivityUseCase.requireActivity().openAppSettingsPage(Permission.AUDIO)
+        mainActivityUseCase.requireActivity().openAppSettingsPage(Permission.MICROPHONE)
     }
 
     private val recordAudioPermissions: List<String> =
