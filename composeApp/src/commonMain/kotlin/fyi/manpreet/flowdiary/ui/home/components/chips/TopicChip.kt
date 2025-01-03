@@ -3,7 +3,7 @@ package fyi.manpreet.flowdiary.ui.home.components.chips
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.common_cancel
 import flowdiary.composeapp.generated.resources.hashtag_cd
@@ -40,7 +41,7 @@ fun TopicChip(
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 shape = MaterialTheme.shapes.large,
             )
-            .height(FilterChipDefaults.Height)
+            .heightIn(min = FilterChipDefaults.Height)
             .padding(horizontal = MaterialTheme.spacing.small),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -58,6 +59,8 @@ fun TopicChip(
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
 
         if (shouldShowCancel.not()) return
