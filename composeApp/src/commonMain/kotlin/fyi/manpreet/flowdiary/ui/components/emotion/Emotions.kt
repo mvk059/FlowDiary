@@ -1,6 +1,5 @@
 package fyi.manpreet.flowdiary.ui.components.emotion
 
-import fyi.manpreet.flowdiary.ui.newrecord.components.bottomsheet.EmotionType
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 

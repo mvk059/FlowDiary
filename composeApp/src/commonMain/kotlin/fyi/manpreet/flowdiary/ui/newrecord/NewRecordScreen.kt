@@ -9,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key.Companion.X
 import androidx.compose.ui.text.input.ImeAction
 import androidx.navigation.NavController
 import com.composables.core.ModalBottomSheetState
@@ -20,13 +19,16 @@ import flowdiary.composeapp.generated.resources.ic_edit
 import flowdiary.composeapp.generated.resources.ic_hashtag
 import flowdiary.composeapp.generated.resources.new_record_add_description
 import flowdiary.composeapp.generated.resources.new_record_add_topic
-import fyi.manpreet.flowdiary.ui.newrecord.components.appbar.NewRecordTopAppBar
+import flowdiary.composeapp.generated.resources.new_record_appbar_title
+import flowdiary.composeapp.generated.resources.new_record_title_cd
+import fyi.manpreet.flowdiary.ui.components.appbar.CenterTopAppBar
 import fyi.manpreet.flowdiary.ui.newrecord.components.bottomsheet.EmotionBottomSheet
 import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.DescriptionTextField
 import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.TitleTextField
 import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.TopicTextField
 import fyi.manpreet.flowdiary.ui.theme.spacing
 import fyi.manpreet.flowdiary.util.Peek
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -67,7 +69,14 @@ fun NewRecordScreenContent(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { NewRecordTopAppBar(onBackClick = onBackClick) }
+        topBar = {
+            CenterTopAppBar(
+                text = stringResource(Res.string.new_record_appbar_title),
+                contentDescription = stringResource(Res.string.new_record_title_cd),
+                containerColor = MaterialTheme.colorScheme.onPrimary,
+                onBackClick = onBackClick,
+            )
+        }
     ) { innerPadding ->
 
         Column(
@@ -77,6 +86,7 @@ fun NewRecordScreenContent(
                 .background(color = MaterialTheme.colorScheme.onPrimary),
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
         ) {
+
             TitleTextField(
                 modifier = Modifier.padding(horizontal = MaterialTheme.spacing.medium),
                 onFeelingClick = onBottomSheetShow

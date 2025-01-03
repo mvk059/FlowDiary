@@ -11,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.util.fastForEach
-import fyi.manpreet.flowdiary.ui.newrecord.components.bottomsheet.EmotionType
 import fyi.manpreet.flowdiary.ui.theme.spacing
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -31,14 +30,13 @@ fun EmotionRow(
 
         emotions.fastForEach { item ->
             IconButton(
-                modifier = Modifier
-                    .size(MaterialTheme.spacing.large3XL),
+                modifier = Modifier.size(MaterialTheme.spacing.large3XL),
                 onClick = { onClick(item.type) },
             ) {
                 Icon(
-                    painter = if (item.isSelected) painterResource(item.selectedIcon) else painterResource(
-                        item.unselectedIcon
-                    ),
+                    painter =
+                    if (item.isSelected) painterResource(item.selectedIcon)
+                    else painterResource(item.unselectedIcon),
                     modifier = Modifier.size(MaterialTheme.spacing.large2XL),
                     contentDescription = stringResource(item.contentDescription),
                     tint = Color.Unspecified,
