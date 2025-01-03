@@ -48,5 +48,7 @@
 	</array>
 	<key>UILaunchStoryboardName</key>
     <string>Launch Screen</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>App needs microphone access to record audio</string>
 </dict>
 </plist>
