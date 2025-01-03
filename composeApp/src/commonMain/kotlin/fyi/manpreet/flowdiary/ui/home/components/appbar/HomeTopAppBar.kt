@@ -22,6 +22,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun HomeTopAppBar(
     modifier: Modifier = Modifier,
+    onSettingsClick: () -> Unit,
 ) {
 
     TopAppBar(
@@ -34,7 +35,7 @@ fun HomeTopAppBar(
         },
         actions = {
             IconButton(
-                onClick = { },
+                onClick = onSettingsClick,
                 content = {
                     Icon(
                         imageVector = Icons.Outlined.Settings,
