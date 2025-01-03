@@ -32,10 +32,14 @@
     <string name="new_record_bottom_sheet_how_doing">How are you doing?</string>
 
     <string name="settings_appbar_title">Settings</string>
-    <string name="settings_my_mood">My mood</string>
+    <string name="settings_my_mood">My Mood</string>
     <string name="settings_my_mood_subtitle">Select default mood to apply to all new entries</string>
+    <string name="settings_my_topics">My Topics</string>
+    <string name="settings_my_topics_subtitle">Select default topics to apply to all new entries</string>
+    <string name="settings_create_new_topic">Create %1$s</string>
 
     <string name="settings_cd">Settings</string>
+    <string name="settings_add_icon_cd">Create new topic</string>
     <string name="fab_cd">Floating Action Button to add an entry</string>
     <string name="chip_clear_selection_cd">Clear selection</string>
     <string name="close_cd">Stop recording</string>
