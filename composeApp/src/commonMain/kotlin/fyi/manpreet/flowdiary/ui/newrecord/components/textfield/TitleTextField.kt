@@ -88,8 +88,5 @@ fun TitleTextField(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Next,
         ),
-//        keyboardActions = KeyboardActions(
-//            onNext = { keyboardController?.hide() }
-//        )
     )
 }

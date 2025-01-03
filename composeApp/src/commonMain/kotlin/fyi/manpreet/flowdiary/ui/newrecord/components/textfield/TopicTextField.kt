@@ -60,7 +60,10 @@ fun TopicTextField(
         ) {
             repeat(0) {
                 TopicChip(
-                    modifier = Modifier.padding(end = MaterialTheme.spacing.extraSmall, bottom = MaterialTheme.spacing.extraSmall),
+                    modifier = Modifier.padding(
+                        end = MaterialTheme.spacing.extraSmall,
+                        bottom = MaterialTheme.spacing.extraSmall
+                    ),
                     topic = "Work",
                     shouldShowCancel = true,
                     onCancel = {},
