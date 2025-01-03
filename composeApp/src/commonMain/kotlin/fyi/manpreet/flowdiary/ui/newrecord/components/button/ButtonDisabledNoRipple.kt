@@ -41,7 +41,7 @@ fun RowScope.ButtonDisabledNoRipple(
             text = stringResource(text),
             modifier = Modifier.align(Alignment.Center),
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.outline,
             textAlign = TextAlign.Center,
         )
     }
