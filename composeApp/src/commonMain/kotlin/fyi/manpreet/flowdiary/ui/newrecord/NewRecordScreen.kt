@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key.Companion.X
 import androidx.compose.ui.text.input.ImeAction
 import androidx.navigation.NavController
 import com.composables.core.ModalBottomSheetState
@@ -21,8 +22,9 @@ import flowdiary.composeapp.generated.resources.new_record_add_description
 import flowdiary.composeapp.generated.resources.new_record_add_topic
 import fyi.manpreet.flowdiary.ui.newrecord.components.appbar.NewRecordTopAppBar
 import fyi.manpreet.flowdiary.ui.newrecord.components.bottomsheet.EmotionBottomSheet
-import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.MiniTextField
+import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.DescriptionTextField
 import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.TitleTextField
+import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.TopicTextField
 import fyi.manpreet.flowdiary.ui.theme.spacing
 import fyi.manpreet.flowdiary.util.Peek
 import org.koin.compose.viewmodel.koinViewModel
@@ -79,13 +81,14 @@ fun NewRecordScreenContent(
                 modifier = Modifier.padding(horizontal = MaterialTheme.spacing.medium),
                 onFeelingClick = onBottomSheetShow
             )
-            MiniTextField(
+
+            TopicTextField(
                 modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large),
                 icon = Res.drawable.ic_hashtag,
                 hintText = Res.string.new_record_add_topic,
+            )
 
-                )
-            MiniTextField(
+            DescriptionTextField(
                 modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large),
                 icon = Res.drawable.ic_edit,
                 hintText = Res.string.new_record_add_description,

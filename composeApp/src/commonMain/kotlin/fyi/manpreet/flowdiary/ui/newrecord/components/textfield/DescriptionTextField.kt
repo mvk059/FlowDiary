@@ -27,7 +27,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun MiniTextField(
+fun DescriptionTextField(
     modifier: Modifier = Modifier,
     icon: DrawableResource,
     hintText: StringResource,
@@ -43,7 +43,7 @@ fun MiniTextField(
 
         Image(
             painter = painterResource(icon),
-            modifier = Modifier.size(MaterialTheme.spacing.medium),
+            modifier = Modifier.padding(top = MaterialTheme.spacing.small).size(MaterialTheme.spacing.large),
             contentDescription = null,
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.outlineVariant),
         )
