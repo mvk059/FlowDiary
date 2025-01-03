@@ -24,12 +24,15 @@ composables-core = "1.20.0"
 material-icon = "1.7.1"
 arrow-bom = "2.0.0"
 kstore = "0.9.1"
+exoplayer = "1.5.1"
+kotlinx-browser = "0.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "androidx-splash" }
+androidx-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "exoplayer" }
 
 compose-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "compose-lifecycle" }
 compose-runtime = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "compose-lifecycle" }
@@ -57,6 +60,7 @@ kstore-storage = { module = "io.github.xxfast:kstore-storage", version.ref = "ks
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 composables-core = { module = "com.composables:core", version.ref = "composables-core" }
 material-icons = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material-icon" }
+kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser-wasm-js", version.ref = "kotlinx-browser" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

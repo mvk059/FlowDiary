@@ -55,6 +55,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.core.splashscreen)
+            implementation(libs.androidx.exoplayer)
 
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
@@ -95,6 +96,7 @@ kotlin {
         }
         wasmJsMain.dependencies {
             implementation(libs.kstore.storage)
+            implementation(libs.kotlinx.browser)
         }
     }
 }

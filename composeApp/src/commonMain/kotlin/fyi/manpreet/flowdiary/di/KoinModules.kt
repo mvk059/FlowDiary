@@ -13,6 +13,7 @@ fun initKoin(config: KoinAppDeclaration? = null) =
         config?.invoke(this)
         modules(
             provideViewModelModule,
+            provideAudioPlayerModule()
         )
     }
 
