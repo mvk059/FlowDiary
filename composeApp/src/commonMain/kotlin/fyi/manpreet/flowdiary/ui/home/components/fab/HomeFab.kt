@@ -53,7 +53,7 @@ fun HomeFab(
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
-                onClick = { onFabClick(HomeEvent.RecordAudio) },
+                onClick = { onFabClick(HomeEvent.FabClick) },
             ),
         contentAlignment = Alignment.Center,
     ) {
