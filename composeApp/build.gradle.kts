@@ -76,6 +76,7 @@ kotlin {
 
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization)
+            implementation(libs.kotlinx.serialization.json)
             api(libs.kotlinx.datetime)
 
             implementation(project.dependencies.platform(libs.koin.bom))
