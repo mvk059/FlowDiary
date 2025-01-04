@@ -10,7 +10,6 @@ data class AudioTable(
     @Serializable
     data class AudioData(
         val id: Long = 0L,
-        val imageUrl: String,
         val createdDateInMillis: Long,
         val path: String,
     )
