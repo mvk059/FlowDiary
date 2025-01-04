@@ -77,7 +77,6 @@ class HomeViewModel(
             HomeEvent.AudioRecorder.Idle -> onAudioRecordIdle()
             HomeEvent.AudioRecorder.Record -> onAudioRecordStart()
             HomeEvent.AudioRecorder.Pause -> onAudioRecordPause()
-            HomeEvent.AudioRecorder.Resume -> onAudioRecordResume()
             HomeEvent.AudioRecorder.Cancel -> onAudioRecordCancel()
             HomeEvent.AudioRecorder.Done -> onAudioRecordDone()
             HomeEvent.Permission.Close -> _permissionStatus.update { PermissionState.NOT_DETERMINED }
@@ -163,6 +162,7 @@ class HomeViewModel(
 
     private fun onAudioRecordIdle() {
         _recordingState.update { HomeEvent.AudioRecorder.Idle }
+        _fabBottomSheet.update { HomeEvent.FabBottomSheet.SheetHide }
     }
 
     private fun onAudioRecordStart() {
@@ -185,14 +185,6 @@ class HomeViewModel(
         }
     }
 
-    private fun onAudioRecordResume() {
-        if (audioRecorder.isPaused().not()) return
-        viewModelScope.launch {
-            _recordingState.update { HomeEvent.AudioRecorder.Resume }
-            audioRecorder.resumeRecording()
-        }
-    }
-
     private fun onAudioRecordCancel() {
         viewModelScope.launch {
             _recordingState.update { HomeEvent.AudioRecorder.Cancel }
@@ -202,7 +194,7 @@ class HomeViewModel(
 
     private fun onAudioRecordDone() {
         viewModelScope.launch {
-            _recordingState.update { HomeEvent.AudioRecorder.Idle }
+            _recordingState.update { HomeEvent.AudioRecorder.Done }
             val filePath = audioRecorder.stopRecording()
             Logger.i { "Audio recording done: $filePath" }
         }
@@ -221,7 +213,7 @@ class HomeViewModel(
             PermissionState.DENIED -> _permissionStatus.update { PermissionState.DENIED }
             PermissionState.GRANTED -> {
                 _permissionStatus.update { PermissionState.GRANTED }
-                _fabBottomSheet.update { HomeEvent.FabBottomSheet.SheetShow }
+                showSheetAndStartRecording()
             }
         }
     }
@@ -233,7 +225,7 @@ class HomeViewModel(
                     Logger.i { "Permission state in flow: $state" }
                     _permissionStatus.update { state }
                     if (state == PermissionState.GRANTED) {
-                        _fabBottomSheet.update { HomeEvent.FabBottomSheet.SheetShow }
+                        showSheetAndStartRecording()
                     }
                 }
         }
@@ -241,5 +233,10 @@ class HomeViewModel(
 
     private fun openSettingsPage(permission: Permission) {
         permissionService.openSettingsPage(permission)
+    }
+
+    private fun showSheetAndStartRecording() {
+        _fabBottomSheet.update { HomeEvent.FabBottomSheet.SheetShow }
+        onAudioRecordStart()
     }
 }

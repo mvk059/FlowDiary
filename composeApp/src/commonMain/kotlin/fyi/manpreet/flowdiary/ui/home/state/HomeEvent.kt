@@ -19,7 +19,6 @@ sealed interface HomeEvent {
         data object Idle : AudioRecorder
         data object Record : AudioRecorder
         data object Pause : AudioRecorder
-        data object Resume : AudioRecorder
         data object Cancel : AudioRecorder
         data object Done : AudioRecorder
     }

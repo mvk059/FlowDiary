@@ -73,6 +73,7 @@ fun HomeScreen(
     }
 
     if (recordingState.value == HomeEvent.AudioRecorder.Done){
+        viewModel.onEvent(HomeEvent.AudioRecorder.Idle)
         onNewRecordClick()
     }
 

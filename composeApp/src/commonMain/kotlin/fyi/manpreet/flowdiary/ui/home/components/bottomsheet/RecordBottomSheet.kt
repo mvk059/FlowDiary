@@ -15,14 +15,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,15 +42,14 @@ import org.jetbrains.compose.resources.stringResource
 fun RecordBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState,
-    onAudioEvent: (HomeEvent.AudioPlayer) -> Unit,
-    onDismiss: () -> Unit,
+    audioEvent: HomeEvent.AudioRecorder,
+    onAudioEvent: (HomeEvent.AudioRecorder) -> Unit,
+    onDismiss: (HomeEvent.FabBottomSheet) -> Unit,
 ) {
-
-    val isPlaying = remember { mutableStateOf(false) }
 
     ModalBottomSheet(
         state = sheetState,
-        onDismiss = onDismiss,
+        onDismiss = { onDismiss(HomeEvent.FabBottomSheet.SheetHide) },
     ) {
 
         Sheet(
@@ -117,7 +115,7 @@ fun RecordBottomSheet(
                                     shape = CircleShape
                                 )
                                 .size(MaterialTheme.spacing.large2XL),
-                            onClick = {},
+                            onClick = { onDismiss(HomeEvent.FabBottomSheet.SheetHide) },
                             content = {
                                 Icon(
                                     imageVector = Icons.Default.Close,
@@ -127,18 +125,20 @@ fun RecordBottomSheet(
                             }
                         )
 
-                        if (isPlaying.value) {
+                        if (audioEvent == HomeEvent.AudioRecorder.Record) {
                             GradientFAB(
-                                isPlaying = isPlaying.value,
-                                onClick = { isPlaying.value = false; onAudioEvent(HomeEvent.AudioPlayer.Pause) },
+                                isPlaying = true,
+                                onClick = { onAudioEvent(HomeEvent.AudioRecorder.Done) },
                             )
                         } else {
                             GradientFAB(
-                                isPlaying = isPlaying.value,
-                                onClick = { isPlaying.value = true; onAudioEvent(HomeEvent.AudioPlayer.Play) },
+                                isPlaying = false,
+                                onClick = { onAudioEvent(HomeEvent.AudioRecorder.Record) },
                             )
                         }
 
+                        val pausePlayIcon =
+                            if (audioEvent == HomeEvent.AudioRecorder.Record) Icons.Default.Pause else Icons.Default.Done
                         IconButton(
                             modifier = Modifier
                                 .background(
@@ -146,10 +146,13 @@ fun RecordBottomSheet(
                                     shape = CircleShape
                                 )
                                 .size(MaterialTheme.spacing.large2XL),
-                            onClick = {},
+                            onClick = {
+                                if (audioEvent == HomeEvent.AudioRecorder.Pause) onAudioEvent(HomeEvent.AudioRecorder.Done)
+                                else onAudioEvent(HomeEvent.AudioRecorder.Pause)
+                            },
                             content = {
                                 Icon(
-                                    imageVector = Icons.Default.Pause,
+                                    imageVector = pausePlayIcon,
                                     contentDescription = stringResource(Res.string.play_cd),
                                     tint = Color.Unspecified,
                                 )
