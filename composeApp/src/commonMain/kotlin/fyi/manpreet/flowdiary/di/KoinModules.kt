@@ -1,5 +1,9 @@
 package fyi.manpreet.flowdiary.di
 
+import fyi.manpreet.flowdiary.data.datasource.AudioLocalDatasource
+import fyi.manpreet.flowdiary.data.datasource.AudioLocalDatasourceImpl
+import fyi.manpreet.flowdiary.data.repository.AudioRepository
+import fyi.manpreet.flowdiary.data.repository.AudioRepositoryImpl
 import fyi.manpreet.flowdiary.platform.permission.service.PermissionService
 import fyi.manpreet.flowdiary.platform.permission.service.PermissionServiceImpl
 import org.koin.core.context.startKoin
@@ -18,9 +22,13 @@ fun initKoin(config: KoinAppDeclaration? = null) =
         modules(
             provideViewModelModule,
             providePermissionModule,
+            provideDataSourceModule,
+            provideRepositoryModule,
             provideAudioPlayerModule(),
             providePermissionsModule(),
-            provideAudioRecordModule()
+            provideAudioRecordModule(),
+            provideStorageManager(),
+            provideStorageModule(),
         )
     }
 
@@ -32,4 +40,12 @@ val provideViewModelModule = module {
 
 private val providePermissionModule = module {
     singleOf(::PermissionServiceImpl) bind PermissionService::class
+}
+
+val provideDataSourceModule = module {
+    singleOf(::AudioLocalDatasourceImpl).bind(AudioLocalDatasource::class)
+}
+
+val provideRepositoryModule = module {
+    singleOf(::AudioRepositoryImpl).bind(AudioRepository::class)
 }
