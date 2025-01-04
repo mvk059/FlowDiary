@@ -28,7 +28,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun HomeFab(
     modifier: Modifier = Modifier,
-    onFabClick: (HomeEvent) -> Unit,
+    onFabClick: (HomeEvent.FabBottomSheet) -> Unit,
 ) {
 
     val interactionSource = remember { MutableInteractionSource() }
@@ -53,7 +53,7 @@ fun HomeFab(
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
-                onClick = { onFabClick(HomeEvent.FabClick) },
+                onClick = { onFabClick(HomeEvent.FabBottomSheet.FabClick) },
             ),
         contentAlignment = Alignment.Center,
     ) {

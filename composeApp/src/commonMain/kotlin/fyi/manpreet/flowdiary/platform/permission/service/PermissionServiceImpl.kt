@@ -23,6 +23,7 @@ internal class PermissionServiceImpl: PermissionService, KoinComponent {
         while (true) {
             val permissionState = getPermissionDelegate(permission).getPermissionState()
             emit(permissionState)
+            if (permissionState != PermissionState.NOT_DETERMINED) break
             delay(1000L)
         }
     }

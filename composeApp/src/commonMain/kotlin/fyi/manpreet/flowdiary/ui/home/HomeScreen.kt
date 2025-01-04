@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -28,6 +30,7 @@ import fyi.manpreet.flowdiary.ui.home.components.list.TimelineItem
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.theme.gradient
 import fyi.manpreet.flowdiary.util.Peek
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -40,41 +43,51 @@ fun HomeScreen(
     val moodChip = viewModel.moodChip.collectAsStateWithLifecycle()
     val topicsChip = viewModel.topicsChip.collectAsStateWithLifecycle()
     val permissionStatus = viewModel.permissionStatus.collectAsStateWithLifecycle()
+    val recordingState = viewModel.recordingState.collectAsStateWithLifecycle()
+    val fabBottomSheet = viewModel.fabBottomSheet.collectAsStateWithLifecycle()
 
+    val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
         initialDetent = Hidden,
         detents = listOf(Hidden, Peek)
     )
 
-    fun dismissBottomSheet() {
-        sheetState.currentDetent = Hidden
+    LaunchedEffect(fabBottomSheet.value) {
+        when(fabBottomSheet.value) {
+            HomeEvent.FabBottomSheet.FabClick -> {}
+            HomeEvent.FabBottomSheet.SheetShow -> {
+                scope.launch { sheetState.animateTo(Peek) }
+            }
+            HomeEvent.FabBottomSheet.SheetHide -> {
+                scope.launch { sheetState.animateTo(Hidden) }
+            }
+        }
     }
 
-    fun showBottomSheet() {
-        sheetState.currentDetent = Peek
-    }
-
-    if (permissionStatus.value == PermissionState.GRANTED) {
-        showBottomSheet()
-    } else if (permissionStatus.value == PermissionState.DENIED) {
+    // Show permission denied dialog when needed
+    if (permissionStatus.value == PermissionState.DENIED) {
         PermissionDeniedDialog(
             onSettingsClick = viewModel::onEvent,
             onDismissRequest = viewModel::onEvent
         )
     }
 
+    if (recordingState.value == HomeEvent.AudioRecorder.Done){
+        onNewRecordClick()
+    }
+
     HomeScreenContent(
         sheetState = sheetState,
         moodChip = moodChip.value,
         topicsChip = topicsChip.value,
+        recordingState = recordingState.value,
         onMoodChipItemSelect = viewModel::onEvent,
         onTopicChipItemSelect = viewModel::onEvent,
         onMoodChipReset = viewModel::onEvent,
         onTopicChipReset = viewModel::onEvent,
         onAudioEvent = viewModel::onEvent,
-        onBottomSheetShow = ::showBottomSheet,
-        onBottomSheetDismiss = ::dismissBottomSheet,
-        onNewRecordClick = onNewRecordClick,
+        onBottomSheetShow = viewModel::onEvent,
+        onBottomSheetDismiss = viewModel::onEvent,
         onSettingsClick = onSettingsClick,
     )
 
@@ -85,14 +98,14 @@ fun HomeScreenContent(
     sheetState: ModalBottomSheetState,
     moodChip: FilterOption?,
     topicsChip: FilterOption?,
+    recordingState: HomeEvent.AudioRecorder,
     onMoodChipItemSelect: (HomeEvent.Chip) -> Unit,
     onTopicChipItemSelect: (HomeEvent.Chip) -> Unit,
     onMoodChipReset: (HomeEvent.Chip) -> Unit,
     onTopicChipReset: (HomeEvent.Chip) -> Unit,
-    onAudioEvent: (HomeEvent) -> Unit,
-    onBottomSheetShow: () -> Unit,
-    onBottomSheetDismiss: () -> Unit,
-    onNewRecordClick: () -> Unit,
+    onAudioEvent: (HomeEvent.AudioRecorder) -> Unit,
+    onBottomSheetShow: (HomeEvent.FabBottomSheet) -> Unit,
+    onBottomSheetDismiss: (HomeEvent.FabBottomSheet) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
 
@@ -101,7 +114,7 @@ fun HomeScreenContent(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { HomeTopAppBar(onSettingsClick = onSettingsClick) },
-        floatingActionButton = { HomeFab(onFabClick = onAudioEvent) },
+        floatingActionButton = { HomeFab(onFabClick = onBottomSheetShow) },
     ) { innerPadding ->
         if (false) {
             HomeScreenEmpty(
@@ -143,6 +156,7 @@ fun HomeScreenContent(
     RecordBottomSheet(
         sheetState = sheetState,
         onDismiss = onBottomSheetDismiss,
+        audioEvent = recordingState,
         onAudioEvent = onAudioEvent,
     )
 }

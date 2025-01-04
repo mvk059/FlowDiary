@@ -9,11 +9,19 @@ sealed interface HomeEvent {
         data object TopicReset : Chip
     }
 
-    data object FabClick : HomeEvent
+    sealed interface FabBottomSheet : HomeEvent {
+        data object FabClick : FabBottomSheet
+        data object SheetShow : FabBottomSheet
+        data object SheetHide : FabBottomSheet
+    }
 
-    sealed interface AudioPlayer : HomeEvent {
-        data object Play : AudioPlayer
-        data object Pause : AudioPlayer
+    sealed interface AudioRecorder : HomeEvent {
+        data object Idle : AudioRecorder
+        data object Record : AudioRecorder
+        data object Pause : AudioRecorder
+        data object Resume : AudioRecorder
+        data object Cancel : AudioRecorder
+        data object Done : AudioRecorder
     }
 
     sealed interface Permission : HomeEvent {
