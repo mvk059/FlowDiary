@@ -29,6 +29,7 @@ fun initKoin(config: KoinAppDeclaration? = null) =
             provideAudioRecordModule(),
             provideStorageManager(),
             provideStorageModule(),
+            provideFileManagerModule(),
         )
     }
 
