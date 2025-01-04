@@ -10,6 +10,7 @@ import flowdiary.composeapp.generated.resources.ic_peaceful
 import flowdiary.composeapp.generated.resources.ic_sad
 import flowdiary.composeapp.generated.resources.ic_stressed
 import fyi.manpreet.flowdiary.platform.audio.AudioPlayer
+import fyi.manpreet.flowdiary.platform.audiorecord.AudioRecorder
 import fyi.manpreet.flowdiary.platform.permission.Permission
 import fyi.manpreet.flowdiary.platform.permission.PermissionState
 import fyi.manpreet.flowdiary.platform.permission.service.PermissionService
@@ -26,6 +27,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 class HomeViewModel(
     private val audioPlayer: AudioPlayer, // TODO Use case
+    private val audioRecorder: AudioRecorder,
     private val permissionService: PermissionService,
 ) : ViewModel() {
 
@@ -49,7 +51,7 @@ class HomeViewModel(
 
     private val _permissionStatus = MutableStateFlow(PermissionState.NOT_DETERMINED)
     val permissionStatus: StateFlow<PermissionState> = _permissionStatus
-        .onStart { }
+        .onStart { observePermissionChanges() }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
@@ -63,7 +65,7 @@ class HomeViewModel(
             is HomeEvent.Chip.TopicChip -> onTopicChipSelect(event.id)
             HomeEvent.Chip.MoodReset -> onMoodChipReset()
             HomeEvent.Chip.TopicReset -> onTopicChipReset()
-            HomeEvent.RecordAudio -> viewModelScope.launch { checkPermission() }
+            HomeEvent.FabClick -> viewModelScope.launch { checkPermission() }
             HomeEvent.AudioPlayer.Pause -> onAudioPause()
             HomeEvent.AudioPlayer.Play -> onAudioPlay()
             HomeEvent.Permission.Close -> _permissionStatus.update { PermissionState.NOT_DETERMINED }
@@ -153,17 +155,20 @@ class HomeViewModel(
         Logger.i { "Permission state: $permissionState" }
 
         when (permissionState) {
-            PermissionState.NOT_DETERMINED -> provideNotificationsPermission()
+            PermissionState.NOT_DETERMINED -> permissionService.providePermission(Permission.MICROPHONE)
             PermissionState.DENIED -> _permissionStatus.update { PermissionState.DENIED }
-            PermissionState.GRANTED -> {
-                _permissionStatus.update { PermissionState.GRANTED }
-            }
+            PermissionState.GRANTED -> _permissionStatus.update { PermissionState.GRANTED }
+
         }
     }
 
-    private suspend fun provideNotificationsPermission() {
-        permissionService.providePermission(Permission.MICROPHONE)
-        checkPermission()
+    private fun observePermissionChanges() {
+        viewModelScope.launch {
+            permissionService.checkPermissionFlow(Permission.MICROPHONE)
+                .collect { state ->
+                    _permissionStatus.update { state }
+                }
+        }
     }
 
     private fun openSettingsPage(permission: Permission) {
