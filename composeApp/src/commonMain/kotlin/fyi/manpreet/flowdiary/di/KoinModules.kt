@@ -20,6 +20,7 @@ fun initKoin(config: KoinAppDeclaration? = null) =
             providePermissionModule,
             provideAudioPlayerModule(),
             providePermissionsModule(),
+            provideAudioRecordModule()
         )
     }
 
