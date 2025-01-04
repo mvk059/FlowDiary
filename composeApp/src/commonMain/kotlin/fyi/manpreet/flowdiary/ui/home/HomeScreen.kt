@@ -37,7 +37,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
     navController: NavController,
-    onNewRecordClick: () -> Unit,
+    onNewRecordClick: (String) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
     val moodChip = viewModel.moodChip.collectAsStateWithLifecycle()
@@ -45,6 +45,7 @@ fun HomeScreen(
     val permissionStatus = viewModel.permissionStatus.collectAsStateWithLifecycle()
     val recordingState = viewModel.recordingState.collectAsStateWithLifecycle()
     val fabBottomSheet = viewModel.fabBottomSheet.collectAsStateWithLifecycle()
+    val recordingPath = viewModel.recordingPath.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
@@ -53,11 +54,12 @@ fun HomeScreen(
     )
 
     LaunchedEffect(fabBottomSheet.value) {
-        when(fabBottomSheet.value) {
+        when (fabBottomSheet.value) {
             HomeEvent.FabBottomSheet.FabClick -> {}
             HomeEvent.FabBottomSheet.SheetShow -> {
                 scope.launch { sheetState.animateTo(Peek) }
             }
+
             HomeEvent.FabBottomSheet.SheetHide -> {
                 scope.launch { sheetState.animateTo(Hidden) }
             }
@@ -72,9 +74,11 @@ fun HomeScreen(
         )
     }
 
-    if (recordingState.value == HomeEvent.AudioRecorder.Done){
+    if (recordingState.value == HomeEvent.AudioRecorder.Done) {
         viewModel.onEvent(HomeEvent.AudioRecorder.Idle)
-        onNewRecordClick()
+        val path = recordingPath.value
+        requireNotNull(path) { "Recording path is null." }
+        onNewRecordClick(path)
     }
 
     HomeScreenContent(

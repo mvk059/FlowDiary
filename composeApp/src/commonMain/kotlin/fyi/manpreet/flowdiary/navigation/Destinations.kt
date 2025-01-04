@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 object HomeDestination
 
 @Serializable
-object NewRecordDestination
+data class NewRecordDestination(val path: String)
 
 @Serializable
 object SettingsDestination

@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import fyi.manpreet.flowdiary.navigation.HomeDestination
 import fyi.manpreet.flowdiary.navigation.NewRecordDestination
 import fyi.manpreet.flowdiary.navigation.SettingsDestination
@@ -29,8 +30,8 @@ fun App(
             composable<HomeDestination> {
                 HomeScreen(
                     navController = navController,
-                    onNewRecordClick = {
-                        navController.navigate(NewRecordDestination)
+                    onNewRecordClick = { path ->
+                        navController.navigate(NewRecordDestination(path = path))
                     },
                     onSettingsClick = {
                         navController.navigate(SettingsDestination)
@@ -39,8 +40,10 @@ fun App(
             }
 
             composable<NewRecordDestination> {
+                val args = it.toRoute<NewRecordDestination>()
                 NewRecordScreen(
                     navController = navController,
+                    path = args.path,
                     onBackClick = { navController.navigateUp() }
                 )
             }

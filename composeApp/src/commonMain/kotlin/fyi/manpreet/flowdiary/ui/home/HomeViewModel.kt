@@ -65,6 +65,9 @@ class HomeViewModel(
     private val _fabBottomSheet = MutableStateFlow<HomeEvent.FabBottomSheet>(HomeEvent.FabBottomSheet.SheetHide)
     val fabBottomSheet: StateFlow<HomeEvent.FabBottomSheet> = _fabBottomSheet.asStateFlow()
 
+    private val _recordingPath = MutableStateFlow<String?>(null)
+    val recordingPath: StateFlow<String?> = _recordingPath.asStateFlow()
+
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.Chip.MoodChip -> onMoodChipSelect(event.id)
@@ -197,6 +200,7 @@ class HomeViewModel(
             _recordingState.update { HomeEvent.AudioRecorder.Done }
             val filePath = audioRecorder.stopRecording()
             Logger.i { "Audio recording done: $filePath" }
+            _recordingPath.update { filePath }
         }
     }
 
