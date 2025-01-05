@@ -17,6 +17,7 @@ import androidx.navigation.NavController
 import com.composables.core.ModalBottomSheetState
 import com.composables.core.SheetDetent.Companion.Hidden
 import com.composables.core.rememberModalBottomSheetState
+import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.platform.permission.PermissionState
 import fyi.manpreet.flowdiary.ui.home.components.appbar.HomeTopAppBar
 import fyi.manpreet.flowdiary.ui.home.components.bottomsheet.RecordBottomSheet
@@ -29,6 +30,7 @@ import fyi.manpreet.flowdiary.ui.home.components.list.AudioEntryContentItem
 import fyi.manpreet.flowdiary.ui.home.components.list.TimelineItem
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.theme.gradient
+import fyi.manpreet.flowdiary.util.Constants
 import fyi.manpreet.flowdiary.util.Peek
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -37,7 +39,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
     navController: NavController,
-    onNewRecordClick: (String) -> Unit,
+    onNewRecordClick: (AudioPath) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
     val moodChip = viewModel.moodChip.collectAsStateWithLifecycle()
@@ -46,6 +48,17 @@ fun HomeScreen(
     val recordingState = viewModel.recordingState.collectAsStateWithLifecycle()
     val fabBottomSheet = viewModel.fabBottomSheet.collectAsStateWithLifecycle()
     val recordingPath = viewModel.recordingPath.collectAsStateWithLifecycle()
+
+    val shouldReload = navController.currentBackStackEntry?.savedStateHandle
+        ?.getStateFlow(Constants.NAVIGATE_BACK_RELOAD, false)
+        ?.collectAsStateWithLifecycle()
+
+    LaunchedEffect(shouldReload?.value) {
+        if (shouldReload?.value == true) {
+            viewModel.onEvent(HomeEvent.Reload)
+            navController.currentBackStackEntry?.savedStateHandle?.set(Constants.NAVIGATE_BACK_RELOAD, false)
+        }
+    }
 
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
@@ -57,11 +70,17 @@ fun HomeScreen(
         when (fabBottomSheet.value) {
             HomeEvent.FabBottomSheet.FabClick -> {}
             HomeEvent.FabBottomSheet.SheetShow -> {
-                scope.launch { sheetState.animateTo(Peek) }
+                scope.launch {
+                    sheetState.animateTo(Peek)
+                    sheetState.currentDetent = Peek
+                }
             }
 
             HomeEvent.FabBottomSheet.SheetHide -> {
-                scope.launch { sheetState.animateTo(Hidden) }
+                scope.launch {
+                    sheetState.animateTo(Hidden)
+                    sheetState.currentDetent = Hidden
+                }
             }
         }
     }

@@ -9,6 +9,7 @@ import flowdiary.composeapp.generated.resources.ic_neutral
 import flowdiary.composeapp.generated.resources.ic_peaceful
 import flowdiary.composeapp.generated.resources.ic_sad
 import flowdiary.composeapp.generated.resources.ic_stressed
+import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.platform.audio.AudioPlayer
 import fyi.manpreet.flowdiary.platform.audiorecord.AudioRecorder
 import fyi.manpreet.flowdiary.platform.permission.Permission
@@ -65,8 +66,8 @@ class HomeViewModel(
     private val _fabBottomSheet = MutableStateFlow<HomeEvent.FabBottomSheet>(HomeEvent.FabBottomSheet.SheetHide)
     val fabBottomSheet: StateFlow<HomeEvent.FabBottomSheet> = _fabBottomSheet.asStateFlow()
 
-    private val _recordingPath = MutableStateFlow<String?>(null)
-    val recordingPath: StateFlow<String?> = _recordingPath.asStateFlow()
+    private val _recordingPath = MutableStateFlow<AudioPath?>(null)
+    val recordingPath: StateFlow<AudioPath?> = _recordingPath.asStateFlow()
 
     fun onEvent(event: HomeEvent) {
         when (event) {
@@ -84,6 +85,7 @@ class HomeViewModel(
             HomeEvent.AudioRecorder.Done -> onAudioRecordDone()
             HomeEvent.Permission.Close -> _permissionStatus.update { PermissionState.NOT_DETERMINED }
             is HomeEvent.Permission.Settings -> openSettingsPage(event.type)
+            HomeEvent.Reload -> onReload()
 
         }
     }
@@ -200,7 +202,7 @@ class HomeViewModel(
             _recordingState.update { HomeEvent.AudioRecorder.Done }
             val filePath = audioRecorder.stopRecording()
             Logger.i { "Audio recording done: $filePath" }
-            _recordingPath.update { filePath }
+            _recordingPath.update { AudioPath(filePath) }
         }
     }
 
@@ -237,6 +239,10 @@ class HomeViewModel(
 
     private fun openSettingsPage(permission: Permission) {
         permissionService.openSettingsPage(permission)
+    }
+
+    private fun onReload() {
+        _fabBottomSheet.update { HomeEvent.FabBottomSheet.SheetHide }
     }
 
     private fun showSheetAndStartRecording() {

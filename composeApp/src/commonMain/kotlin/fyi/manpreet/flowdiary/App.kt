@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.navigation.HomeDestination
 import fyi.manpreet.flowdiary.navigation.NewRecordDestination
 import fyi.manpreet.flowdiary.navigation.SettingsDestination
@@ -13,6 +14,7 @@ import fyi.manpreet.flowdiary.ui.home.HomeScreen
 import fyi.manpreet.flowdiary.ui.newrecord.NewRecordScreen
 import fyi.manpreet.flowdiary.ui.settings.SettingsScreen
 import fyi.manpreet.flowdiary.ui.theme.FlowTheme
+import fyi.manpreet.flowdiary.util.Constants
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -31,7 +33,7 @@ fun App(
                 HomeScreen(
                     navController = navController,
                     onNewRecordClick = { path ->
-                        navController.navigate(NewRecordDestination(path = path))
+                        navController.navigate(NewRecordDestination(path = path.value))
                     },
                     onSettingsClick = {
                         navController.navigate(SettingsDestination)
@@ -43,8 +45,14 @@ fun App(
                 val args = it.toRoute<NewRecordDestination>()
                 NewRecordScreen(
                     navController = navController,
-                    path = args.path,
-                    onBackClick = { navController.navigateUp() }
+                    path = AudioPath(args.path),
+                    onBackClick = {
+                        navController.previousBackStackEntry?.savedStateHandle?.set(
+                            key = Constants.NAVIGATE_BACK_RELOAD,
+                            value = true
+                        )
+                        navController.popBackStack()
+                    },
                 )
             }
 

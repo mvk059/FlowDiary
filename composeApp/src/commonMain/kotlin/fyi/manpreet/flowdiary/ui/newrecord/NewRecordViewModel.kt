@@ -149,6 +149,7 @@ class NewRecordViewModel(
     private fun onEmotionSave(emotionType: EmotionType) {
         _newRecordState.update { state -> state?.copy(emotionType = emotionType) }
         _fabBottomSheet.update { NewRecordEvent.FabBottomSheet.SheetHide }
+        updateSaveButtonState()
     }
 
     private fun onShowBottomSheet() {

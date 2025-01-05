@@ -70,7 +70,7 @@ fun NewRecordScreen(
         viewModel.savePath(path)
     }
 
-    LaunchedEffect(newRecordState.value) {
+    LaunchedEffect(newRecordState.value?.onNavigateBack) {
         if (newRecordState.value?.onNavigateBack == true) {
             onBackClick()
         }
@@ -83,8 +83,14 @@ fun NewRecordScreen(
 
     LaunchedEffect(fabBottomSheet.value) {
         when (fabBottomSheet.value) {
-            NewRecordEvent.FabBottomSheet.SheetShow -> scope.launch { sheetState.animateTo(Peek) }
-            NewRecordEvent.FabBottomSheet.SheetHide -> scope.launch { sheetState.animateTo(Hidden) }
+            NewRecordEvent.FabBottomSheet.SheetShow -> scope.launch {
+                sheetState.animateTo(Peek);
+                sheetState.currentDetent = Peek
+            }
+            NewRecordEvent.FabBottomSheet.SheetHide -> scope.launch {
+                sheetState.animateTo(Hidden)
+                sheetState.currentDetent = Hidden
+            }
         }
     }
 
@@ -107,6 +113,7 @@ fun NewRecordScreen(
         description = newRecordState.value?.description,
         onDescriptionUpdate = viewModel::onEvent,
         isSaveButtonEnabled = newRecordState.value?.isSaveButtonEnabled,
+        onSave = viewModel::onEvent,
         isBackDialogVisible = newRecordState.value?.onBackConfirm,
         onBackClick = viewModel::onEvent,
         onBackConfirm = viewModel::onEvent,
@@ -135,6 +142,7 @@ fun NewRecordScreenContent(
     description: String?,
     onDescriptionUpdate: (NewRecordEvent.Data) -> Unit,
     isSaveButtonEnabled: Boolean?,
+    onSave: (NewRecordEvent.Save) -> Unit,
     isBackDialogVisible: Boolean?,
     onBackClick: (NewRecordEvent) -> Unit,
     onBackConfirm: (NewRecordEvent) -> Unit,
@@ -228,7 +236,7 @@ fun NewRecordScreenContent(
                     ButtonPrimaryEnabledNoRipple(
                         modifier = Modifier.weight(0.7f),
                         text = Res.string.common_save,
-                        onClick = {},
+                        onClick = { onSave(NewRecordEvent.Save) },
                         weight = 0.7f,
                     )
                 } else {

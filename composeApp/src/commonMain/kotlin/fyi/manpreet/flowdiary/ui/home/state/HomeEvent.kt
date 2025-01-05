@@ -27,4 +27,6 @@ sealed interface HomeEvent {
         data class Settings(val type: fyi.manpreet.flowdiary.platform.permission.Permission) : Permission
         data object Close : Permission
     }
+
+    data object Reload : HomeEvent
 }
