@@ -203,7 +203,7 @@ class NewRecordViewModel(
                 createdDateInMillis = 0L,
                 title = title,
                 emotionType = emotionType,
-                topics = data.topics,
+                topics = data.selectedTopics.toList(),
                 description = data.description,
             )
             repository.insertRecording(audio)

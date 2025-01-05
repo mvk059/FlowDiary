@@ -10,6 +10,7 @@ import flowdiary.composeapp.generated.resources.ic_peaceful
 import flowdiary.composeapp.generated.resources.ic_sad
 import flowdiary.composeapp.generated.resources.ic_stressed
 import fyi.manpreet.flowdiary.data.model.AudioPath
+import fyi.manpreet.flowdiary.data.repository.AudioRepository
 import fyi.manpreet.flowdiary.platform.audio.AudioPlayer
 import fyi.manpreet.flowdiary.platform.audiorecord.AudioRecorder
 import fyi.manpreet.flowdiary.platform.permission.Permission
@@ -32,6 +33,7 @@ class HomeViewModel(
     private val audioPlayer: AudioPlayer, // TODO Use case
     private val audioRecorder: AudioRecorder,
     private val permissionService: PermissionService,
+    private val repository: AudioRepository,
 ) : ViewModel() {
 
     private val _homeState = MutableStateFlow(HomeState())
@@ -95,7 +97,16 @@ class HomeViewModel(
             title = "All Topics",
             options = listOf(),
         )
-        _homeState.update { state -> state.copy(moodChip = moodChip, topicsChip = topicChip) }
+        viewModelScope.launch {
+            val allRecordings = repository.getAllRecordings()
+            _homeState.update { state ->
+                state.copy(
+                    recordings = allRecordings,
+                    moodChip = moodChip,
+                    topicsChip = topicChip
+                )
+            }
+        }
     }
 
     private fun onMoodChipSelect(id: Int) {

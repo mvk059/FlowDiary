@@ -2,6 +2,8 @@ package fyi.manpreet.flowdiary.ui.home.components.list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,12 +14,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.ui.home.components.chips.TopicChip
 import fyi.manpreet.flowdiary.ui.theme.spacing
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AudioEntryContentItem(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    recording: Audio,
 ) {
 
     Card(
@@ -42,7 +47,7 @@ fun AudioEntryContentItem(
             ) {
 
                 Text(
-                    text = "My Entry",
+                    text = recording.title,
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -58,13 +63,14 @@ fun AudioEntryContentItem(
 
             val sampleText =
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tit amet, consectetur adipiscing elit, sed tLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tit amet, consectetur adipiscing elit, sed t"
-            ExpandableText(text = sampleText)
+            ExpandableText(text = recording.description)
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small)
+            FlowRow(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                TopicChip(topic = "Work")
-                TopicChip(topic = "Office")
+                recording.topics.forEach { topic ->
+                    TopicChip(topic = topic.value)
+                }
             }
         }
     }

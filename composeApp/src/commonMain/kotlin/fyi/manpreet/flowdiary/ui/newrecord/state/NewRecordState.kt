@@ -8,7 +8,6 @@ data class NewRecordState(
     val title: String? = null,
     val emotionType: EmotionType? = null,
     val emotions: List<Emotions> = emptyList(),
-    val topics: List<Topic> = emptyList(),
     val selectedTopics: Set<Topic> = emptySet(),
     val savedTopics: Set<Topic> = setOf(Topic("Work"), Topic("Love"), Topic("Jack"), Topic("Jared")), //emptySet(),
     val isAddingTopic: Boolean = false,

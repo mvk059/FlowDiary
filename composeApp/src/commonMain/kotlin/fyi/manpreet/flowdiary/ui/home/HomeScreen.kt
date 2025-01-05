@@ -17,6 +17,7 @@ import androidx.navigation.NavController
 import com.composables.core.ModalBottomSheetState
 import com.composables.core.SheetDetent.Companion.Hidden
 import com.composables.core.rememberModalBottomSheetState
+import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.platform.permission.PermissionState
 import fyi.manpreet.flowdiary.ui.home.components.appbar.HomeTopAppBar
@@ -99,6 +100,7 @@ fun HomeScreen(
 
     HomeScreenContent(
         sheetState = sheetState,
+        recordings = homeState.value.recordings,
         moodChip = homeState.value.moodChip,
         topicsChip = homeState.value.topicsChip,
         recordingState = recordingState.value,
@@ -117,6 +119,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     sheetState: ModalBottomSheetState,
+    recordings: List<Audio>,
     moodChip: FilterOption?,
     topicsChip: FilterOption?,
     recordingState: HomeEvent.AudioRecorder,
@@ -130,16 +133,15 @@ fun HomeScreenContent(
     onSettingsClick: () -> Unit,
 ) {
 
-    val list = listOf(1, 2, 3)
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { HomeTopAppBar(onSettingsClick = onSettingsClick) },
         floatingActionButton = { HomeFab(onFabClick = onBottomSheetShow) },
     ) { innerPadding ->
-        if (false) {
+        if (recordings.isEmpty()) {
             HomeScreenEmpty(
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier
+                    .padding(innerPadding)
                     .background(brush = MaterialTheme.gradient.background)
             )
             return@Scaffold
@@ -163,12 +165,11 @@ fun HomeScreenContent(
                     )
                 }
 
-                itemsIndexed(list) { index, item ->
+                itemsIndexed(recordings) { index, item ->
                     TimelineItem(
-                        isLastItem = index == list.lastIndex,
-                    ) { modifier ->
-                        AudioEntryContentItem(modifier)
-                    }
+                        isLastItem = index == recordings.lastIndex,
+                        content = { modifier -> AudioEntryContentItem(modifier, item) }
+                    )
                 }
             }
         }
