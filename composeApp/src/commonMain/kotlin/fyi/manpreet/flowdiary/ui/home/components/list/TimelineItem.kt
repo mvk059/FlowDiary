@@ -57,7 +57,7 @@ fun TimelineItem(
                 painter = painterResource(Res.drawable.ic_excited),
                 contentDescription = null,
                 modifier = Modifier.padding(
-                    top = MaterialTheme.spacing.small,
+                    top = MaterialTheme.spacing.smallMedium,
                     start = MaterialTheme.spacing.small
                 ),
                 tint = Color.Unspecified,
@@ -65,7 +65,7 @@ fun TimelineItem(
 
             content(
                 Modifier.padding(
-                    start = MaterialTheme.spacing.small,
+                    start = MaterialTheme.spacing.medium,
                     end = MaterialTheme.spacing.medium,
                     bottom = if (isLastItem.not()) MaterialTheme.spacing.medium else 0.dp
                 )
