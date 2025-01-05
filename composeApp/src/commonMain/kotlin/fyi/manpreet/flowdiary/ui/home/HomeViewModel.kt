@@ -9,6 +9,7 @@ import flowdiary.composeapp.generated.resources.ic_neutral
 import flowdiary.composeapp.generated.resources.ic_peaceful
 import flowdiary.composeapp.generated.resources.ic_sad
 import flowdiary.composeapp.generated.resources.ic_stressed
+import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.data.repository.AudioRepository
 import fyi.manpreet.flowdiary.platform.audio.AudioPlayer
@@ -19,6 +20,7 @@ import fyi.manpreet.flowdiary.platform.permission.service.PermissionService
 import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.home.state.HomeState
+import fyi.manpreet.flowdiary.util.toRecordingList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -98,10 +100,10 @@ class HomeViewModel(
             options = listOf(),
         )
         viewModelScope.launch {
-            val allRecordings = repository.getAllRecordings()
+            val allRecordings: List<Audio> = repository.getAllRecordings()
             _homeState.update { state ->
                 state.copy(
-                    recordings = allRecordings,
+                    recordings = allRecordings.toRecordingList(),
                     moodChip = moodChip,
                     topicsChip = topicChip
                 )
@@ -155,6 +157,9 @@ class HomeViewModel(
 
     private fun onFabBottomSheetHide() {
         _homeState.update { state -> state.copy(fabBottomSheet = HomeEvent.FabBottomSheet.SheetHide) }
+        viewModelScope.launch {
+            if (audioRecorder.isRecording()) audioRecorder.discardRecording()
+        }
     }
 
     private fun onAudioRecordIdle() {

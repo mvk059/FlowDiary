@@ -5,9 +5,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -17,7 +18,6 @@ import androidx.navigation.NavController
 import com.composables.core.ModalBottomSheetState
 import com.composables.core.SheetDetent.Companion.Hidden
 import com.composables.core.rememberModalBottomSheetState
-import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.platform.permission.PermissionState
 import fyi.manpreet.flowdiary.ui.home.components.appbar.HomeTopAppBar
@@ -30,7 +30,9 @@ import fyi.manpreet.flowdiary.ui.home.components.fab.HomeFab
 import fyi.manpreet.flowdiary.ui.home.components.list.AudioEntryContentItem
 import fyi.manpreet.flowdiary.ui.home.components.list.TimelineItem
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
+import fyi.manpreet.flowdiary.ui.home.state.Recordings
 import fyi.manpreet.flowdiary.ui.theme.gradient
+import fyi.manpreet.flowdiary.ui.theme.spacing
 import fyi.manpreet.flowdiary.util.Constants
 import fyi.manpreet.flowdiary.util.Peek
 import kotlinx.coroutines.launch
@@ -119,7 +121,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     sheetState: ModalBottomSheetState,
-    recordings: List<Audio>,
+    recordings: List<Recordings>,
     moodChip: FilterOption?,
     topicsChip: FilterOption?,
     recordingState: HomeEvent.AudioRecorder,
@@ -165,11 +167,29 @@ fun HomeScreenContent(
                     )
                 }
 
-                itemsIndexed(recordings) { index, item ->
-                    TimelineItem(
-                        isLastItem = index == recordings.lastIndex,
-                        content = { modifier -> AudioEntryContentItem(modifier, item) }
-                    )
+                items(recordings) { item ->
+
+                    when (item) {
+                        is Recordings.Date -> {
+                            Text(
+                                text = item.date,
+                                modifier = Modifier
+                                    .padding(start = MaterialTheme.spacing.small)
+                                    .padding(top = MaterialTheme.spacing.large, bottom = MaterialTheme.spacing.medium),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+
+                        is Recordings.Entry -> {
+                            item.recordings.forEachIndexed { index, recording ->
+                                TimelineItem(
+                                    isLastItem = index == item.recordings.lastIndex,
+                                    content = { modifier -> AudioEntryContentItem(modifier, recording) }
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }

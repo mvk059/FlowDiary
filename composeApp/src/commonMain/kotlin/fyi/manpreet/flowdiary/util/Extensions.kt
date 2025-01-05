@@ -8,6 +8,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import com.composables.core.SheetDetent
+import fyi.manpreet.flowdiary.data.model.Audio
+import fyi.manpreet.flowdiary.ui.home.state.Recordings
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 val Peek = SheetDetent(identifier = "peek") { containerHeight, sheetHeight ->
     containerHeight * 0.3f
@@ -25,4 +30,21 @@ fun Modifier.noRippleClickable(
     ) {
         onClick()
     }
+}
+
+fun List<Audio>.toRecordingList(): List<Recordings> {
+    return this
+        .groupBy { audio ->
+            Instant.fromEpochMilliseconds(audio.createdDateInMillis)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .date.toString()
+        }
+        .entries
+        .sortedByDescending { it.key }
+        .flatMap { (date, audioList) ->
+            listOf(
+                Recordings.Date(date),
+                Recordings.Entry(audioList)
+            )
+        }
 }
