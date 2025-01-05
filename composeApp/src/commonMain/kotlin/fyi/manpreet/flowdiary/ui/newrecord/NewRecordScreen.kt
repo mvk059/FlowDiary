@@ -104,7 +104,9 @@ fun NewRecordScreen(
         onAddingTopicChange = viewModel::onEvent,
         searchQuery = newRecordState.value?.searchQuery,
         onSearchQueryChange = viewModel::onEvent,
+        description = newRecordState.value?.description,
         onDescriptionUpdate = viewModel::onEvent,
+        isSaveButtonEnabled = newRecordState.value?.isSaveButtonEnabled,
         isBackDialogVisible = newRecordState.value?.onBackConfirm,
         onBackClick = viewModel::onEvent,
         onBackConfirm = viewModel::onEvent,
@@ -130,7 +132,9 @@ fun NewRecordScreenContent(
     onAddingTopicChange: (NewRecordEvent.Data.Topics) -> Unit,
     searchQuery: String?,
     onSearchQueryChange: (NewRecordEvent.Data.Topics) -> Unit,
+    description: String?,
     onDescriptionUpdate: (NewRecordEvent.Data) -> Unit,
+    isSaveButtonEnabled: Boolean?,
     isBackDialogVisible: Boolean?,
     onBackClick: (NewRecordEvent) -> Unit,
     onBackConfirm: (NewRecordEvent) -> Unit,
@@ -182,6 +186,8 @@ fun NewRecordScreenContent(
 
             DescriptionTextField(
                 modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large),
+                descriptionText = description ?: "",
+                onDescriptionUpdate = onDescriptionUpdate,
                 icon = Res.drawable.ic_edit,
                 hintText = Res.string.new_record_add_description,
                 imeAction = ImeAction.Done,
@@ -218,7 +224,7 @@ fun NewRecordScreenContent(
                     )
                 }
 
-                if (false) {
+                if (isSaveButtonEnabled == true) {
                     ButtonPrimaryEnabledNoRipple(
                         modifier = Modifier.weight(0.7f),
                         text = Res.string.common_save,

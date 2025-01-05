@@ -166,6 +166,7 @@ private fun ChipFlowRow(
             onValueChange = { onSearchQueryChange(NewRecordEvent.Data.Topics.SearchQueryChanged(it)) },
             modifier = Modifier
                 .wrapContentWidth()
+                .padding(start = MaterialTheme.spacing.small)
                 .then(
                     if (selectedTopics.isNotEmpty()) Modifier.padding(top = MaterialTheme.spacing.small)
                     else Modifier
