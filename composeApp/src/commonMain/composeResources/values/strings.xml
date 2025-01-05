@@ -31,6 +31,9 @@
     <string name="new_record_add_topic">Topic</string>
     <string name="new_record_add_description">Add Description...</string>
     <string name="new_record_bottom_sheet_how_doing">How are you doing?</string>
+    <string name="new_record_leave_title">Discard Audio Entry?</string>
+    <string name="new_record_leave_subtitle">You will lose your audio entry. If you're fine with that, press 'Leave'.</string>
+
 
     <string name="settings_appbar_title">Settings</string>
     <string name="settings_my_mood">My Mood</string>
