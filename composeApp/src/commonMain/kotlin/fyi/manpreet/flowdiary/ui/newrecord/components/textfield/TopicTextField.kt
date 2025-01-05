@@ -7,43 +7,101 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import fyi.manpreet.flowdiary.ui.home.components.chips.TopicChip
+import fyi.manpreet.flowdiary.ui.home.state.Topic
+import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordEvent
+import fyi.manpreet.flowdiary.ui.settings.components.topic.TopicDropdown
 import fyi.manpreet.flowdiary.ui.theme.spacing
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TopicTextField(
     modifier: Modifier = Modifier,
     icon: DrawableResource,
+    selectedTopics: Set<Topic>,
+    onSelectedTopicChange: (NewRecordEvent.Data.Topics) -> Unit,
+    savedTopics: Set<Topic>,
+    onSavedTopicsChange: (NewRecordEvent.Data.Topics) -> Unit,
+    isAddingTopic: Boolean,
+    onAddingTopicChange: (NewRecordEvent.Data.Topics) -> Unit,
+    searchQuery: String,
+    onSearchQueryChange: (NewRecordEvent.Data.Topics) -> Unit,
     hintText: StringResource,
     imeAction: ImeAction = ImeAction.Next,
 ) {
 
-    var textFieldValue by remember { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusRequester = remember { FocusRequester() }
+
+    TopicsList(
+        modifier = modifier,
+        icon = icon,
+        hintText = hintText,
+        imeAction = imeAction,
+        selectedTopics = selectedTopics,
+        onSelectedTopics = onSelectedTopicChange,
+        onAddingTopicChange = onAddingTopicChange,
+        searchQuery = searchQuery,
+        onSearchQueryChange = onSearchQueryChange,
+        focusRequester = focusRequester,
+        keyboardController = keyboardController,
+    )
+
+    if (searchQuery.isEmpty()) return
+
+    TopicDropdown(
+        modifier = modifier,
+        selectedTopics = selectedTopics,
+        onSelectedTopicsChange = { onAddingTopicChange(NewRecordEvent.Data.Topics.SelectedTopicsChange(it)) },
+        isAddingTopic = isAddingTopic,
+        onAddingTopicChange = { onAddingTopicChange(NewRecordEvent.Data.Topics.IsAddingStatusChange(it)) },
+        searchQuery = searchQuery,
+        onSearchQueryChange = { onSearchQueryChange(NewRecordEvent.Data.Topics.SearchQueryChanged(it)) },
+        savedTopics = savedTopics,
+        onSavedTopicsChange = { onSavedTopicsChange(NewRecordEvent.Data.Topics.SavedTopicsChange(it)) },
+    )
+}
+
+@Composable
+private fun TopicsList(
+    modifier: Modifier = Modifier,
+    icon: DrawableResource,
+    hintText: StringResource,
+    imeAction: ImeAction,
+    selectedTopics: Set<Topic>,
+    onSelectedTopics: (NewRecordEvent.Data.Topics) -> Unit,
+    onAddingTopicChange: (NewRecordEvent.Data.Topics) -> Unit,
+    searchQuery: String,
+    onSearchQueryChange: (NewRecordEvent.Data.Topics) -> Unit,
+    focusRequester: FocusRequester,
+    keyboardController: SoftwareKeyboardController?,
+) {
 
     Row(
-        modifier = modifier.fillMaxWidth().wrapContentHeight(),
+        modifier = modifier.fillMaxWidth().heightIn(min = FilterChipDefaults.Height),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
     ) {
@@ -55,43 +113,86 @@ fun TopicTextField(
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.outlineVariant),
         )
 
-        FlowRow(
-            verticalArrangement = Arrangement.Center,
-        ) {
-            repeat(0) {
-                TopicChip(
-                    modifier = Modifier.padding(
-                        end = MaterialTheme.spacing.extraSmall,
-                        bottom = MaterialTheme.spacing.extraSmall
-                    ),
-                    topic = "Work",
-                    shouldShowCancel = true,
-                    onCancel = {},
-                )
-            }
+        ChipFlowRow(
+            hintText = hintText,
+            imeAction = imeAction,
+            selectedTopics = selectedTopics,
+            onSelectedTopics = onSelectedTopics,
+            onAddingTopicChange = onAddingTopicChange,
+            searchQuery = searchQuery,
+            onSearchQueryChange = onSearchQueryChange,
+            focusRequester = focusRequester,
+            keyboardController = keyboardController,
+        )
+    }
+}
 
-            BasicTextField(
-                value = textFieldValue,
-                onValueChange = { textFieldValue = it },
-                modifier = Modifier.padding(start = MaterialTheme.spacing.small), //top = MaterialTheme.spacing.small), TODO Add this padding only if flow row has data
-                textStyle = MaterialTheme.typography.bodyMedium,
-                maxLines = 10,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = imeAction,
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ChipFlowRow(
+    hintText: StringResource,
+    imeAction: ImeAction,
+    selectedTopics: Set<Topic>,
+    onSelectedTopics: (NewRecordEvent.Data.Topics) -> Unit,
+    onAddingTopicChange: (NewRecordEvent.Data.Topics) -> Unit,
+    searchQuery: String,
+    onSearchQueryChange: (NewRecordEvent.Data.Topics) -> Unit,
+    focusRequester: FocusRequester,
+    keyboardController: SoftwareKeyboardController?,
+) {
+
+    // Selected Topics
+    FlowRow(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
+        selectedTopics.forEach { topic ->
+            fyi.manpreet.flowdiary.ui.home.components.chips.TopicChip(
+                modifier = Modifier.padding(
+                    end = MaterialTheme.spacing.extraSmall,
+                    bottom = MaterialTheme.spacing.extraSmall
                 ),
-                decorationBox = { innerTextField ->
-                    Box {
-                        if (textFieldValue.isEmpty()) {
-                            Text(
-                                text = stringResource(hintText),
-                                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.outlineVariant)
-                            )
-                        }
-                        innerTextField()
-                    }
+                topic = topic.value,
+                shouldShowCancel = true,
+                onCancel = {
+                    onSelectedTopics(NewRecordEvent.Data.Topics.SelectedTopicsChange(selectedTopics - topic))
                 }
             )
         }
+
+        // Search/Add Topic Dialog
+        BasicTextField(
+            value = searchQuery,
+            onValueChange = { onSearchQueryChange(NewRecordEvent.Data.Topics.SearchQueryChanged(it)) },
+            modifier = Modifier
+                .wrapContentWidth()
+                .then(
+                    if (selectedTopics.isNotEmpty()) Modifier.padding(top = MaterialTheme.spacing.small)
+                    else Modifier
+                )
+                .focusRequester(focusRequester),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = imeAction,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboardController?.hide()
+                    onAddingTopicChange(NewRecordEvent.Data.Topics.IsAddingStatusChange(false))
+                }
+            ),
+            decorationBox = { innerTextField ->
+                Box {
+                    if (searchQuery.isEmpty() && selectedTopics.isEmpty()) {
+                        Text(
+                            text = stringResource(hintText),
+                            style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.outlineVariant)
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        )
     }
 }

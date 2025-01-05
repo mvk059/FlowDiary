@@ -67,7 +67,10 @@ class NewRecordViewModel(
             is NewRecordEvent.Data.UpdateTitle -> onTitleUpdated(event.title)
             is NewRecordEvent.Data.UpdateEmotion -> onEmotionUpdated(event.type)
             is NewRecordEvent.Data.SaveEmotion -> onEmotionSave(event.type)
-            is NewRecordEvent.Data.UpdateTopic -> onTopicUpdated(event.topic)
+            is NewRecordEvent.Data.Topics.SelectedTopicsChange -> onSelectedTopicsChange(event.topics)
+            is NewRecordEvent.Data.Topics.SavedTopicsChange -> onSavedTopicsChange(event.savedTopics)
+            is NewRecordEvent.Data.Topics.IsAddingStatusChange -> onIsAddingStatusChange(event.status)
+            is NewRecordEvent.Data.Topics.SearchQueryChanged -> onSearchQueryChanged(event.query)
             is NewRecordEvent.Data.UpdateDescription -> onDescriptionUpdated(event.description)
             NewRecordEvent.Save -> onSave()
             is NewRecordEvent.BackConfirm -> onBackConfirm(event.value)
@@ -154,8 +157,20 @@ class NewRecordViewModel(
         }
     }
 
-    private fun onTopicUpdated(topic: String) {
-        _newRecordState.update { state -> state?.copy(topics = state.topics + Topic(topic)) }
+    private fun onSelectedTopicsChange(topics: Set<Topic>) {
+        _newRecordState.update { state -> state?.copy(selectedTopics = topics) }
+    }
+
+    private fun onSavedTopicsChange(savedTopics: Set<Topic>) {
+        _newRecordState.update { state -> state?.copy(savedTopics = savedTopics) }
+    }
+
+    private fun onIsAddingStatusChange(status: Boolean) {
+        _newRecordState.update { state -> state?.copy(isAddingTopic = status) }
+    }
+
+    private fun onSearchQueryChanged(query: String) {
+        _newRecordState.update { state -> state?.copy(searchQuery = query) }
     }
 
     private fun onDescriptionUpdated(description: String) {

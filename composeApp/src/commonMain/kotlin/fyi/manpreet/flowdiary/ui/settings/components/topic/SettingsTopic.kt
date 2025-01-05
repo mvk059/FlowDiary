@@ -50,6 +50,7 @@ import flowdiary.composeapp.generated.resources.settings_add_icon_cd
 import flowdiary.composeapp.generated.resources.settings_create_new_topic
 import flowdiary.composeapp.generated.resources.settings_my_topics
 import flowdiary.composeapp.generated.resources.settings_my_topics_subtitle
+import fyi.manpreet.flowdiary.ui.home.state.Topic
 import fyi.manpreet.flowdiary.ui.theme.Secondary95
 import fyi.manpreet.flowdiary.ui.theme.spacing
 import org.jetbrains.compose.resources.painterResource
@@ -60,8 +61,8 @@ fun TopicsSelection(
     modifier: Modifier = Modifier,
 ) {
     // Track both selected topics and all saved topics
-    var selectedTopics by remember { mutableStateOf(setOf<String>()) }
-    var savedTopics by remember { mutableStateOf(setOf("Work", "Love", "Jack", "Jared")) }
+    var selectedTopics by remember { mutableStateOf(setOf<Topic>()) }
+    var savedTopics by remember { mutableStateOf(setOf(Topic("Work"), Topic("Love"), Topic("Jack"), Topic("Jared"))) }
     var isAddingTopic by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -86,7 +87,7 @@ fun TopicsSelection(
     TopicDropdown(
         modifier = modifier,
         selectedTopics = selectedTopics,
-        onSelectedTopics = { selectedTopics = it },
+        onSelectedTopicsChange = { selectedTopics = it },
         isAddingTopic = isAddingTopic,
         onAddingTopicChange = { isAddingTopic = it },
         searchQuery = searchQuery,
@@ -99,14 +100,14 @@ fun TopicsSelection(
 @Composable
 private fun TopicsList(
     modifier: Modifier = Modifier,
-    selectedTopics: Set<String>,
-    onSelectedTopics: (Set<String>) -> Unit,
+    selectedTopics: Set<Topic>,
+    onSelectedTopics: (Set<Topic>) -> Unit,
     isAddingTopic: Boolean,
     onAddingTopicChange: (Boolean) -> Unit,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    savedTopics: Set<String>,
-    onSavedTopicsChange: (Set<String>) -> Unit,
+    savedTopics: Set<Topic>,
+    onSavedTopicsChange: (Set<Topic>) -> Unit,
     focusRequester: FocusRequester,
     keyboardController: SoftwareKeyboardController?,
 ) {
@@ -117,7 +118,7 @@ private fun TopicsList(
             .shadow(
                 elevation = MaterialTheme.spacing.large,
                 shape = MaterialTheme.shapes.medium,
-                spotColor = Color(0xFF474F60).copy(alpha = 0.08f)
+                spotColor = Color(0xFF474F60).copy(alpha = 0.08f) // TODO Remove hardcoded color
             ),
         color = MaterialTheme.colorScheme.onPrimary,
     ) {
@@ -163,14 +164,14 @@ private fun TitleText() {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ChipFlowRow(
-    selectedTopics: Set<String>,
-    onSelectedTopics: (Set<String>) -> Unit,
+    selectedTopics: Set<Topic>,
+    onSelectedTopics: (Set<Topic>) -> Unit,
     isAddingTopic: Boolean,
     onAddingTopicChange: (Boolean) -> Unit,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    savedTopics: Set<String>,
-    onSavedTopicsChange: (Set<String>) -> Unit,
+    savedTopics: Set<Topic>,
+    onSavedTopicsChange: (Set<Topic>) -> Unit,
     focusRequester: FocusRequester,
     keyboardController: SoftwareKeyboardController?,
 ) {
@@ -194,7 +195,7 @@ private fun ChipFlowRow(
                     end = MaterialTheme.spacing.extraSmall,
                     bottom = MaterialTheme.spacing.extraSmall
                 ),
-                topic = topic,
+                topic = topic.value,
                 shouldShowCancel = true,
                 onCancel = { onSelectedTopics(selectedTopics - topic) }
             )
@@ -228,23 +229,28 @@ private fun ChipFlowRow(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done,
                 ),
-                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboardController?.hide()
+                        onAddingTopicChange(false)
+                    }
+                )
             )
         }
     }
 }
 
 @Composable
-private fun TopicDropdown(
+fun TopicDropdown(
     modifier: Modifier = Modifier,
-    selectedTopics: Set<String>,
-    onSelectedTopics: (Set<String>) -> Unit,
+    selectedTopics: Set<Topic>,
+    onSelectedTopicsChange: (Set<Topic>) -> Unit,
     isAddingTopic: Boolean,
     onAddingTopicChange: (Boolean) -> Unit,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    savedTopics: Set<String>,
-    onSavedTopicsChange: (Set<String>) -> Unit = {},
+    savedTopics: Set<Topic>,
+    onSavedTopicsChange: (Set<Topic>) -> Unit = {},
 ) {
 
     Box(
@@ -264,7 +270,7 @@ private fun TopicDropdown(
 
             // Filter saved topics based on search query
             val matchingSavedTopics = savedTopics.filter {
-                it.startsWith(prefix = searchQuery, ignoreCase = true)
+                it.value.startsWith(prefix = searchQuery, ignoreCase = true)
                         && !selectedTopics.contains(it)
             }
 
@@ -275,7 +281,7 @@ private fun TopicDropdown(
                         .fillMaxWidth()
                         .clickable(
                             onClick = {
-                                onSelectedTopics(selectedTopics + topic)
+                                onSelectedTopicsChange(selectedTopics + topic)
                                 onSearchQueryChange("")
                                 onAddingTopicChange(false)
                             }
@@ -291,7 +297,7 @@ private fun TopicDropdown(
                     )
 
                     Text(
-                        text = topic,
+                        text = topic.value,
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -299,14 +305,14 @@ private fun TopicDropdown(
             }
 
             // Show create option if query doesn't exist in saved topics
-            if (!savedTopics.any { it.equals(searchQuery, ignoreCase = true) }) {
+            if (!savedTopics.any { it.value.equals(searchQuery, ignoreCase = true) }) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            val newTopic = searchQuery.trim()
+                            val newTopic = Topic(searchQuery.trim())
                             onSavedTopicsChange(savedTopics + newTopic)
-                            onSelectedTopics(selectedTopics + newTopic)
+                            onSelectedTopicsChange(selectedTopics + newTopic)
                             onSearchQueryChange("")
                             onAddingTopicChange(false)
                         }

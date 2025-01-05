@@ -1,11 +1,18 @@
 package fyi.manpreet.flowdiary.data.mapper
 
+import flowdiary.composeapp.generated.resources.Res
+import flowdiary.composeapp.generated.resources.ic_excited
+import flowdiary.composeapp.generated.resources.ic_neutral
+import flowdiary.composeapp.generated.resources.ic_peaceful
+import flowdiary.composeapp.generated.resources.ic_sad
+import flowdiary.composeapp.generated.resources.ic_stressed
 import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.data.model.AudioTable
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.ui.home.state.Topic
 import kotlinx.datetime.Clock
+import org.jetbrains.compose.resources.DrawableResource
 
 fun Audio.toAudioData(): AudioTable.AudioData {
     val path = this.path
@@ -73,5 +80,16 @@ fun String.toEmotionType(): EmotionType? {
         "Sad" -> EmotionType.Sad
         "Stressed" -> EmotionType.Stressed
         else -> null
+    }
+}
+
+fun EmotionType?.toIcon(): DrawableResource {
+    return when (this) {
+        EmotionType.Excited -> Res.drawable.ic_excited
+        EmotionType.Peaceful -> Res.drawable.ic_peaceful
+        EmotionType.Neutral -> Res.drawable.ic_neutral
+        EmotionType.Sad -> Res.drawable.ic_sad
+        EmotionType.Stressed -> Res.drawable.ic_stressed
+        else -> Res.drawable.ic_excited
     }
 }

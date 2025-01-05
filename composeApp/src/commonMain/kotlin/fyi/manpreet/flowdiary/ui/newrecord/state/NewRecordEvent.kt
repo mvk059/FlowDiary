@@ -1,7 +1,7 @@
 package fyi.manpreet.flowdiary.ui.newrecord.state
 
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
-import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
+import fyi.manpreet.flowdiary.ui.home.state.Topic
 
 sealed interface NewRecordEvent {
 
@@ -9,7 +9,14 @@ sealed interface NewRecordEvent {
         data class UpdateTitle(val title: String) : Data
         data class UpdateEmotion(val type: EmotionType) : Data
         data class SaveEmotion(val type: EmotionType) : Data
-        data class UpdateTopic(val topic: String) : Data
+
+        sealed interface Topics : NewRecordEvent {
+            data class SelectedTopicsChange(val topics: Set<Topic>) : Topics
+            data class SavedTopicsChange(val savedTopics: Set<Topic>) : Topics
+            data class IsAddingStatusChange(val status: Boolean)   : Topics
+            data class SearchQueryChanged(val query: String) : Topics
+        }
+
         data class UpdateDescription(val description: String) : Data
     }
 

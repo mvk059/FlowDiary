@@ -38,7 +38,7 @@ import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.ui.components.appbar.CenterTopAppBar
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.ui.components.emotion.Emotions
-import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
+import fyi.manpreet.flowdiary.ui.home.state.Topic
 import fyi.manpreet.flowdiary.ui.newrecord.components.bottomsheet.EmotionBottomSheet
 import fyi.manpreet.flowdiary.ui.newrecord.components.button.ButtonDisabledNoRipple
 import fyi.manpreet.flowdiary.ui.newrecord.components.button.ButtonPrimaryEnabledNoRipple
@@ -47,7 +47,6 @@ import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.DescriptionTextF
 import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.TitleTextField
 import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.TopicTextField
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordEvent
-import fyi.manpreet.flowdiary.ui.settings.components.mood.emotions
 import fyi.manpreet.flowdiary.ui.theme.spacing
 import fyi.manpreet.flowdiary.util.Peek
 import fyi.manpreet.flowdiary.util.noRippleClickable
@@ -91,13 +90,20 @@ fun NewRecordScreen(
 
     NewRecordScreenContent(
         sheetState = sheetState,
-        title = newRecordState.value?.title,
-        emotionType = newRecordState.value?.emotionType,
         emotions = newRecordState.value?.emotions,
-        emotionsSaveButtonEnabled = newRecordState.value?.isEmotionSaveButtonEnabled ?: false,
+        emotionType = newRecordState.value?.emotionType,
         onEmotionTypeSelect = viewModel::onEvent,
+        emotionsSaveButtonEnabled = newRecordState.value?.isEmotionSaveButtonEnabled ?: false,
+        title = newRecordState.value?.title,
         onTitleUpdate = viewModel::onEvent,
-        onTopicUpdate = viewModel::onEvent,
+        selectedTopics = newRecordState.value?.selectedTopics,
+        onSelectedTopicChange = viewModel::onEvent,
+        savedTopics = newRecordState.value?.savedTopics,
+        onSavedTopicsChange = viewModel::onEvent,
+        isAddingTopic = newRecordState.value?.isAddingTopic,
+        onAddingTopicChange = viewModel::onEvent,
+        searchQuery = newRecordState.value?.searchQuery,
+        onSearchQueryChange = viewModel::onEvent,
         onDescriptionUpdate = viewModel::onEvent,
         isBackDialogVisible = newRecordState.value?.onBackConfirm,
         onBackClick = viewModel::onEvent,
@@ -110,13 +116,20 @@ fun NewRecordScreen(
 @Composable
 fun NewRecordScreenContent(
     sheetState: ModalBottomSheetState,
-    title: String?,
-    emotionType: EmotionType?,
     emotions: List<Emotions>?,
-    emotionsSaveButtonEnabled: Boolean,
+    emotionType: EmotionType?,
     onEmotionTypeSelect: (NewRecordEvent.Data) -> Unit,
+    emotionsSaveButtonEnabled: Boolean,
+    title: String?,
     onTitleUpdate: (NewRecordEvent.Data) -> Unit,
-    onTopicUpdate: (NewRecordEvent.Data) -> Unit,
+    selectedTopics: Set<Topic>?,
+    onSelectedTopicChange: (NewRecordEvent.Data.Topics) -> Unit,
+    savedTopics: Set<Topic>?,
+    onSavedTopicsChange: (NewRecordEvent.Data.Topics) -> Unit,
+    isAddingTopic: Boolean?,
+    onAddingTopicChange: (NewRecordEvent.Data.Topics) -> Unit,
+    searchQuery: String?,
+    onSearchQueryChange: (NewRecordEvent.Data.Topics) -> Unit,
     onDescriptionUpdate: (NewRecordEvent.Data) -> Unit,
     isBackDialogVisible: Boolean?,
     onBackClick: (NewRecordEvent) -> Unit,
@@ -156,6 +169,14 @@ fun NewRecordScreenContent(
             TopicTextField(
                 modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large),
                 icon = Res.drawable.ic_hashtag,
+                selectedTopics = selectedTopics ?: emptySet(),
+                onSelectedTopicChange = onSelectedTopicChange,
+                savedTopics = savedTopics ?: emptySet(),
+                onSavedTopicsChange = onSavedTopicsChange,
+                isAddingTopic = isAddingTopic ?: false,
+                onAddingTopicChange = onAddingTopicChange,
+                searchQuery = searchQuery ?: "",
+                onSearchQueryChange = onSearchQueryChange,
                 hintText = Res.string.new_record_add_topic,
             )
 
