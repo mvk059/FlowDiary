@@ -122,6 +122,7 @@ class NewRecordViewModel(
 
     private fun onTitleUpdated(title: String) {
         _newRecordState.update { state -> state?.copy(title = title) }
+        updateSaveButtonState()
     }
 
     private fun onEmotionUpdated(emotionType: EmotionType) {
@@ -132,6 +133,15 @@ class NewRecordViewModel(
                     else emotion.copy(isSelected = false)
                 },
                 isEmotionSaveButtonEnabled = true,
+            )
+        }
+        updateSaveButtonState()
+    }
+
+    private fun updateSaveButtonState() {
+        _newRecordState.update { state ->
+            state?.copy(
+                isSaveButtonEnabled = _newRecordState.value?.title?.isNotEmpty() == true && _newRecordState.value?.emotionType != null
             )
         }
     }
@@ -155,6 +165,7 @@ class NewRecordViewModel(
                 },
             )
         }
+        updateSaveButtonState()
     }
 
     private fun onSelectedTopicsChange(topics: Set<Topic>) {
