@@ -16,6 +16,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -27,74 +31,33 @@ import com.composables.core.Sheet
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.common_cancel
 import flowdiary.composeapp.generated.resources.common_confirm
-import flowdiary.composeapp.generated.resources.ic_excited
-import flowdiary.composeapp.generated.resources.ic_excited_outline
-import flowdiary.composeapp.generated.resources.ic_neutal_outline
-import flowdiary.composeapp.generated.resources.ic_neutral
-import flowdiary.composeapp.generated.resources.ic_peaceful
-import flowdiary.composeapp.generated.resources.ic_peaceful_outline
-import flowdiary.composeapp.generated.resources.ic_sad
-import flowdiary.composeapp.generated.resources.ic_sad_outline
-import flowdiary.composeapp.generated.resources.ic_stressed
-import flowdiary.composeapp.generated.resources.ic_stressed_outline
-import flowdiary.composeapp.generated.resources.mood_excited
-import flowdiary.composeapp.generated.resources.mood_neutral
-import flowdiary.composeapp.generated.resources.mood_peaceful
-import flowdiary.composeapp.generated.resources.mood_sad
-import flowdiary.composeapp.generated.resources.mood_stressed
 import flowdiary.composeapp.generated.resources.new_record_bottom_sheet_how_doing
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionRow
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.ui.components.emotion.Emotions
 import fyi.manpreet.flowdiary.ui.newrecord.components.button.ButtonDisabledNoRipple
 import fyi.manpreet.flowdiary.ui.newrecord.components.button.ButtonPrimaryEnabledNoRipple
+import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordEvent
 import fyi.manpreet.flowdiary.ui.theme.spacing
 import fyi.manpreet.flowdiary.util.noRippleClickable
 import org.jetbrains.compose.resources.stringResource
-
-val emotions = listOf(
-    Emotions(
-        type = EmotionType.Excited,
-        selectedIcon = Res.drawable.ic_excited,
-        unselectedIcon = Res.drawable.ic_excited_outline,
-        contentDescription = Res.string.mood_excited,
-    ),
-    Emotions(
-        type = EmotionType.Peaceful,
-        selectedIcon = Res.drawable.ic_peaceful,
-        unselectedIcon = Res.drawable.ic_peaceful_outline,
-        contentDescription = Res.string.mood_peaceful,
-    ),
-    Emotions(
-        type = EmotionType.Neutral,
-        selectedIcon = Res.drawable.ic_neutral,
-        unselectedIcon = Res.drawable.ic_neutal_outline,
-        contentDescription = Res.string.mood_neutral,
-    ),
-    Emotions(
-        type = EmotionType.Sad,
-        selectedIcon = Res.drawable.ic_sad,
-        unselectedIcon = Res.drawable.ic_sad_outline,
-        contentDescription = Res.string.mood_sad,
-    ),
-    Emotions(
-        type = EmotionType.Stressed,
-        selectedIcon = Res.drawable.ic_stressed,
-        unselectedIcon = Res.drawable.ic_stressed_outline,
-        contentDescription = Res.string.mood_stressed,
-    ),
-)
 
 @Composable
 fun EmotionBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState,
-    onDismiss: () -> Unit,
+    emotions: List<Emotions>?,
+    emotionsSaveButtonEnabled: Boolean,
+    onEmotionTypeSelect: (NewRecordEvent.Data) -> Unit,
+    onDismiss: (NewRecordEvent.FabBottomSheet) -> Unit,
 ) {
+
+    if (emotions.isNullOrEmpty()) return
+    var selectedIcon by remember { mutableStateOf<EmotionType?>(null) }
 
     ModalBottomSheet(
         state = sheetState,
-        onDismiss = onDismiss,
+        onDismiss = { onDismiss(NewRecordEvent.FabBottomSheet.SheetHide) },
     ) {
 
         Sheet(
@@ -153,7 +116,10 @@ fun EmotionBottomSheet(
                             .fillMaxWidth()
                             .padding(top = MaterialTheme.spacing.large),
                         emotions = emotions,
-                        onClick = {},
+                        onClick = {
+                            selectedIcon = it
+                            onEmotionTypeSelect(NewRecordEvent.Data.UpdateEmotion(selectedIcon!!))
+                        },
                     )
 
                     Row(
@@ -175,7 +141,7 @@ fun EmotionBottomSheet(
                                     color = MaterialTheme.colorScheme.inverseOnSurface,
                                     shape = MaterialTheme.shapes.large
                                 )
-                                .noRippleClickable { onDismiss() }
+                                .noRippleClickable { onDismiss(NewRecordEvent.FabBottomSheet.SheetHide) }
                                 .weight(0.3f)
                         ) {
                             Text(
@@ -186,11 +152,14 @@ fun EmotionBottomSheet(
                             )
                         }
 
-                        if (true) {
+                        if (emotionsSaveButtonEnabled) {
                             ButtonPrimaryEnabledNoRipple(
                                 modifier = Modifier.weight(0.7f),
                                 text = Res.string.common_confirm,
-                                onClick = {},
+                                onClick = {
+                                    if (selectedIcon != null)
+                                        onEmotionTypeSelect(NewRecordEvent.Data.SaveEmotion(selectedIcon!!))
+                                },
                                 weight = 0.7f,
                             )
                         } else {
@@ -202,10 +171,8 @@ fun EmotionBottomSheet(
                             )
                         }
                     }
-
                 }
             }
         }
     }
-
 }

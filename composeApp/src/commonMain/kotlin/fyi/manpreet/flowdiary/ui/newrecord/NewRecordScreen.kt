@@ -16,9 +16,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.composables.core.ModalBottomSheetState
 import com.composables.core.SheetDetent.Companion.Hidden
@@ -32,16 +34,24 @@ import flowdiary.composeapp.generated.resources.new_record_add_description
 import flowdiary.composeapp.generated.resources.new_record_add_topic
 import flowdiary.composeapp.generated.resources.new_record_appbar_title
 import flowdiary.composeapp.generated.resources.new_record_title_cd
+import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.ui.components.appbar.CenterTopAppBar
+import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
+import fyi.manpreet.flowdiary.ui.components.emotion.Emotions
+import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.newrecord.components.bottomsheet.EmotionBottomSheet
 import fyi.manpreet.flowdiary.ui.newrecord.components.button.ButtonDisabledNoRipple
 import fyi.manpreet.flowdiary.ui.newrecord.components.button.ButtonPrimaryEnabledNoRipple
+import fyi.manpreet.flowdiary.ui.newrecord.components.dialog.BackConfirmationDialog
 import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.DescriptionTextField
 import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.TitleTextField
 import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.TopicTextField
+import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordEvent
+import fyi.manpreet.flowdiary.ui.settings.components.mood.emotions
 import fyi.manpreet.flowdiary.ui.theme.spacing
 import fyi.manpreet.flowdiary.util.Peek
 import fyi.manpreet.flowdiary.util.noRippleClickable
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -49,12 +59,22 @@ import org.koin.compose.viewmodel.koinViewModel
 fun NewRecordScreen(
     viewModel: NewRecordViewModel = koinViewModel(),
     navController: NavController,
-    path: String,
+    path: AudioPath,
     onBackClick: () -> Unit,
 ) {
 
+    val newRecordState = viewModel.newRecordState.collectAsStateWithLifecycle()
+    val fabBottomSheet = viewModel.fabBottomSheet.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
         viewModel.savePath(path)
+    }
+
+    LaunchedEffect(newRecordState.value) {
+        if (newRecordState.value?.onNavigateBack == true) {
+            onBackClick()
+        }
     }
 
     val sheetState = rememberModalBottomSheetState(
@@ -62,28 +82,47 @@ fun NewRecordScreen(
         detents = listOf(Hidden, Peek)
     )
 
-    fun dismissBottomSheet() {
-        sheetState.currentDetent = Hidden
-    }
-
-    fun showBottomSheet() {
-        sheetState.currentDetent = Peek
+    LaunchedEffect(fabBottomSheet.value) {
+        when (fabBottomSheet.value) {
+            NewRecordEvent.FabBottomSheet.SheetShow -> scope.launch { sheetState.animateTo(Peek) }
+            NewRecordEvent.FabBottomSheet.SheetHide -> scope.launch { sheetState.animateTo(Hidden) }
+        }
     }
 
     NewRecordScreenContent(
         sheetState = sheetState,
-        onBackClick = onBackClick,
-        onBottomSheetShow = ::showBottomSheet,
-        onBottomSheetDismiss = ::dismissBottomSheet,
+        title = newRecordState.value?.title,
+        emotionType = newRecordState.value?.emotionType,
+        emotions = newRecordState.value?.emotions,
+        emotionsSaveButtonEnabled = newRecordState.value?.isEmotionSaveButtonEnabled ?: false,
+        onEmotionTypeSelect = viewModel::onEvent,
+        onTitleUpdate = viewModel::onEvent,
+        onTopicUpdate = viewModel::onEvent,
+        onDescriptionUpdate = viewModel::onEvent,
+        isBackDialogVisible = newRecordState.value?.onBackConfirm,
+        onBackClick = viewModel::onEvent,
+        onBackConfirm = viewModel::onEvent,
+        onBottomSheetShow = viewModel::onEvent,
+        onBottomSheetDismiss = viewModel::onEvent,
     )
 }
 
 @Composable
 fun NewRecordScreenContent(
     sheetState: ModalBottomSheetState,
-    onBackClick: () -> Unit,
-    onBottomSheetShow: () -> Unit,
-    onBottomSheetDismiss: () -> Unit,
+    title: String?,
+    emotionType: EmotionType?,
+    emotions: List<Emotions>?,
+    emotionsSaveButtonEnabled: Boolean,
+    onEmotionTypeSelect: (NewRecordEvent.Data) -> Unit,
+    onTitleUpdate: (NewRecordEvent.Data) -> Unit,
+    onTopicUpdate: (NewRecordEvent.Data) -> Unit,
+    onDescriptionUpdate: (NewRecordEvent.Data) -> Unit,
+    isBackDialogVisible: Boolean?,
+    onBackClick: (NewRecordEvent) -> Unit,
+    onBackConfirm: (NewRecordEvent) -> Unit,
+    onBottomSheetShow: (NewRecordEvent.FabBottomSheet) -> Unit,
+    onBottomSheetDismiss: (NewRecordEvent.FabBottomSheet) -> Unit,
 ) {
 
     Scaffold(
@@ -93,7 +132,7 @@ fun NewRecordScreenContent(
                 text = stringResource(Res.string.new_record_appbar_title),
                 contentDescription = stringResource(Res.string.new_record_title_cd),
                 containerColor = MaterialTheme.colorScheme.onPrimary,
-                onBackClick = onBackClick,
+                onBackClick = { onBackClick(NewRecordEvent.BackConfirm(true)) },
             )
         }
     ) { innerPadding ->
@@ -108,7 +147,10 @@ fun NewRecordScreenContent(
 
             TitleTextField(
                 modifier = Modifier.padding(horizontal = MaterialTheme.spacing.medium),
-                onFeelingClick = onBottomSheetShow
+                title = title,
+                emotionType = emotionType,
+                onAddClick = onBottomSheetShow,
+                onTitleUpdate = onTitleUpdate,
             )
 
             TopicTextField(
@@ -144,7 +186,7 @@ fun NewRecordScreenContent(
                             color = MaterialTheme.colorScheme.inverseOnSurface,
                             shape = MaterialTheme.shapes.large
                         )
-                        .noRippleClickable { }
+                        .noRippleClickable { onBackClick(NewRecordEvent.BackConfirm(true)) }
                         .weight(0.3f)
                 ) {
                     Text(
@@ -172,10 +214,20 @@ fun NewRecordScreenContent(
                 }
             }
         }
+
+        if (isBackDialogVisible == true) {
+            BackConfirmationDialog(
+                onBack = onBackConfirm,
+                onCancel = onBackClick,
+            )
+        }
     }
 
     EmotionBottomSheet(
         sheetState = sheetState,
+        emotions = emotions,
+        emotionsSaveButtonEnabled = emotionsSaveButtonEnabled,
+        onEmotionTypeSelect = onEmotionTypeSelect,
         onDismiss = onBottomSheetDismiss
     )
 }

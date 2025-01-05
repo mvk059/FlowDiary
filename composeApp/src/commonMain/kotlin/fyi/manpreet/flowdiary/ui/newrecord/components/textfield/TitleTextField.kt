@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -16,10 +15,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -30,20 +26,26 @@ import androidx.compose.ui.text.input.KeyboardType
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.new_record_add_icon_cd
 import flowdiary.composeapp.generated.resources.new_record_add_title
+import fyi.manpreet.flowdiary.data.mapper.toIcon
+import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
+import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordEvent
 import fyi.manpreet.flowdiary.ui.theme.Secondary70
 import fyi.manpreet.flowdiary.ui.theme.Secondary95
 import fyi.manpreet.flowdiary.ui.theme.spacing
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun TitleTextField(
     modifier: Modifier = Modifier,
-    onFeelingClick: () -> Unit,
+    title: String?,
+    emotionType: EmotionType?,
+    onAddClick: (NewRecordEvent.FabBottomSheet) -> Unit,
+    onTitleUpdate: (NewRecordEvent.Data) -> Unit,
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
-    var textFieldValue by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -51,23 +53,40 @@ fun TitleTextField(
     }
 
     TextField(
-        value = textFieldValue,
-        onValueChange = { textFieldValue = it },
+        value = title ?: "",
+        onValueChange = { onTitleUpdate(NewRecordEvent.Data.UpdateTitle(it)) },
         modifier = modifier.fillMaxWidth().focusRequester(focusRequester),
         leadingIcon = {
-            IconButton(
-                onClick = onFeelingClick,
-                modifier = Modifier
-                    .background(color = Secondary95, shape = CircleShape)
-                    .size(MaterialTheme.spacing.largeXL),
-                content = {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = stringResource(Res.string.new_record_add_icon_cd),
-                        tint = Secondary70,
-                    )
-                }
-            )
+            if (emotionType == null) {
+                IconButton(
+                    onClick = { onAddClick(NewRecordEvent.FabBottomSheet.SheetShow) },
+                    modifier = Modifier
+                        .background(color = Secondary95, shape = CircleShape)
+                        .size(MaterialTheme.spacing.largeXL),
+                    content = {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(Res.string.new_record_add_icon_cd),
+                            tint = Secondary70,
+                        )
+                    }
+                )
+            } else {
+                IconButton(
+                    onClick = { onAddClick(NewRecordEvent.FabBottomSheet.SheetShow) },
+                    modifier = Modifier
+                        .background(color = Secondary95, shape = CircleShape)
+                        .size(MaterialTheme.spacing.largeXL),
+                    content = {
+                        Icon(
+                            painter = painterResource(emotionType.toIcon()),
+                            modifier = Modifier.size(MaterialTheme.spacing.largeXL),
+                            contentDescription = stringResource(Res.string.new_record_add_icon_cd),
+                            tint = Color.Unspecified,
+                        )
+                    }
+                )
+            }
         },
         placeholder = {
             Text(
