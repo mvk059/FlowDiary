@@ -42,12 +42,9 @@ fun HomeScreen(
     onNewRecordClick: (AudioPath) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
-    val moodChip = viewModel.moodChip.collectAsStateWithLifecycle()
-    val topicsChip = viewModel.topicsChip.collectAsStateWithLifecycle()
+    val homeState = viewModel.homeState.collectAsStateWithLifecycle()
     val permissionStatus = viewModel.permissionStatus.collectAsStateWithLifecycle()
     val recordingState = viewModel.recordingState.collectAsStateWithLifecycle()
-    val fabBottomSheet = viewModel.fabBottomSheet.collectAsStateWithLifecycle()
-    val recordingPath = viewModel.recordingPath.collectAsStateWithLifecycle()
 
     val shouldReload = navController.currentBackStackEntry?.savedStateHandle
         ?.getStateFlow(Constants.NAVIGATE_BACK_RELOAD, false)
@@ -66,8 +63,8 @@ fun HomeScreen(
         detents = listOf(Hidden, Peek)
     )
 
-    LaunchedEffect(fabBottomSheet.value) {
-        when (fabBottomSheet.value) {
+    LaunchedEffect(homeState.value.fabBottomSheet) {
+        when (homeState.value.fabBottomSheet) {
             HomeEvent.FabBottomSheet.FabClick -> {}
             HomeEvent.FabBottomSheet.SheetShow -> {
                 scope.launch {
@@ -95,15 +92,15 @@ fun HomeScreen(
 
     if (recordingState.value == HomeEvent.AudioRecorder.Done) {
         viewModel.onEvent(HomeEvent.AudioRecorder.Idle)
-        val path = recordingPath.value
+        val path = homeState.value.recordingPath
         requireNotNull(path) { "Recording path is null." }
         onNewRecordClick(path)
     }
 
     HomeScreenContent(
         sheetState = sheetState,
-        moodChip = moodChip.value,
-        topicsChip = topicsChip.value,
+        moodChip = homeState.value.moodChip,
+        topicsChip = homeState.value.topicsChip,
         recordingState = recordingState.value,
         onMoodChipItemSelect = viewModel::onEvent,
         onTopicChipItemSelect = viewModel::onEvent,

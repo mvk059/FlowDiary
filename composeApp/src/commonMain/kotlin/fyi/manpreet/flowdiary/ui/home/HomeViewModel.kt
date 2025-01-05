@@ -17,6 +17,7 @@ import fyi.manpreet.flowdiary.platform.permission.PermissionState
 import fyi.manpreet.flowdiary.platform.permission.service.PermissionService
 import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
+import fyi.manpreet.flowdiary.ui.home.state.HomeState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -33,22 +34,13 @@ class HomeViewModel(
     private val permissionService: PermissionService,
 ) : ViewModel() {
 
-    private val _moodChip = MutableStateFlow<FilterOption?>(null)
-    val moodChip = _moodChip
-        .onStart { initMoodChip() }
+    private val _homeState = MutableStateFlow(HomeState())
+    val homeState = _homeState
+        .onStart { initHomeState() }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = null
-        )
-
-    private val _topicsChip = MutableStateFlow<FilterOption?>(null)
-    val topicsChip = _topicsChip
-        .onStart { initTopicChip() }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = null
+            initialValue = HomeState()
         )
 
     private val _permissionStatus = MutableStateFlow(PermissionState.NOT_DETERMINED)
@@ -62,12 +54,6 @@ class HomeViewModel(
 
     private val _recordingState = MutableStateFlow<HomeEvent.AudioRecorder>(HomeEvent.AudioRecorder.Idle)
     val recordingState: StateFlow<HomeEvent.AudioRecorder> = _recordingState.asStateFlow()
-
-    private val _fabBottomSheet = MutableStateFlow<HomeEvent.FabBottomSheet>(HomeEvent.FabBottomSheet.SheetHide)
-    val fabBottomSheet: StateFlow<HomeEvent.FabBottomSheet> = _fabBottomSheet.asStateFlow()
-
-    private val _recordingPath = MutableStateFlow<AudioPath?>(null)
-    val recordingPath: StateFlow<AudioPath?> = _recordingPath.asStateFlow()
 
     fun onEvent(event: HomeEvent) {
         when (event) {
@@ -86,7 +72,6 @@ class HomeViewModel(
             HomeEvent.Permission.Close -> _permissionStatus.update { PermissionState.NOT_DETERMINED }
             is HomeEvent.Permission.Settings -> openSettingsPage(event.type)
             HomeEvent.Reload -> onReload()
-
         }
     }
 
@@ -95,8 +80,8 @@ class HomeViewModel(
         audioPlayer.release()
     }
 
-    private fun initMoodChip() {
-        val filterOption = FilterOption(
+    private fun initHomeState() {
+        val moodChip = FilterOption(
             title = "All Moods",
             options = listOf(
                 FilterOption.Options(id = 1, text = "Excited", icon = Res.drawable.ic_excited),
@@ -106,19 +91,15 @@ class HomeViewModel(
                 FilterOption.Options(id = 5, text = "Stressed", icon = Res.drawable.ic_stressed),
             )
         )
-        _moodChip.update { filterOption }
-    }
-
-    private fun initTopicChip() {
-        val filterOption = FilterOption(
+        val topicChip = FilterOption(
             title = "All Topics",
             options = listOf(),
         )
-        _topicsChip.update { filterOption }
+        _homeState.update { state -> state.copy(moodChip = moodChip, topicsChip = topicChip) }
     }
 
     private fun onMoodChipSelect(id: Int) {
-        val moodChip = _moodChip.value
+        val moodChip = _homeState.value.moodChip
         require(moodChip != null) { "Mood chip can not be null." }
 
         val options = moodChip.options.map {
@@ -126,11 +107,11 @@ class HomeViewModel(
             else it
         }
 
-        _moodChip.update { it?.copy(options = options) }
+        _homeState.update { state -> state.copy(moodChip = state.moodChip?.copy(options = options)) }
     }
 
     private fun onTopicChipSelect(id: Int) {
-        val topicsChip = _topicsChip.value
+        val topicsChip = _homeState.value.topicsChip
         require(topicsChip != null) { "Topic chip can not be null." }
 
         val options = topicsChip.options.map {
@@ -138,36 +119,36 @@ class HomeViewModel(
             else it
         }
 
-        _topicsChip.update { it?.copy(options = options) }
+        _homeState.update { state -> state.copy(moodChip = state.topicsChip?.copy(options = options)) }
     }
 
     private fun onMoodChipReset() {
-        val moodChip = _moodChip.value
+        val moodChip = _homeState.value.moodChip
         require(moodChip != null) { "Mood chip can not be null." }
 
         val options = moodChip.options.map { it.copy(isSelected = false) }
-        _moodChip.update { it?.copy(options = options) }
+        _homeState.update { state -> state.copy(moodChip = state.moodChip?.copy(options = options)) }
     }
 
     private fun onTopicChipReset() {
-        val topicsChip = _topicsChip.value
+        val topicsChip = _homeState.value.topicsChip
         require(topicsChip != null) { "Topic chip can not be null." }
 
         val options = topicsChip.options.map { it.copy(isSelected = false) }
-        _topicsChip.update { it?.copy(options = options) }
+        _homeState.update { state -> state.copy(moodChip = state.topicsChip?.copy(options = options)) }
     }
 
     private fun onFabBottomSheetShow() {
-        _fabBottomSheet.update { HomeEvent.FabBottomSheet.SheetShow }
+        _homeState.update { state -> state.copy(fabBottomSheet = HomeEvent.FabBottomSheet.SheetShow) }
     }
 
     private fun onFabBottomSheetHide() {
-        _fabBottomSheet.update { HomeEvent.FabBottomSheet.SheetHide }
+        _homeState.update { state -> state.copy(fabBottomSheet = HomeEvent.FabBottomSheet.SheetHide) }
     }
 
     private fun onAudioRecordIdle() {
         _recordingState.update { HomeEvent.AudioRecorder.Idle }
-        _fabBottomSheet.update { HomeEvent.FabBottomSheet.SheetHide }
+        onFabBottomSheetHide()
     }
 
     private fun onAudioRecordStart() {
@@ -202,7 +183,7 @@ class HomeViewModel(
             _recordingState.update { HomeEvent.AudioRecorder.Done }
             val filePath = audioRecorder.stopRecording()
             Logger.i { "Audio recording done: $filePath" }
-            _recordingPath.update { AudioPath(filePath) }
+            _homeState.update { it.copy(recordingPath = AudioPath(filePath)) }
         }
     }
 
@@ -242,11 +223,11 @@ class HomeViewModel(
     }
 
     private fun onReload() {
-        _fabBottomSheet.update { HomeEvent.FabBottomSheet.SheetHide }
+        onFabBottomSheetHide()
     }
 
     private fun showSheetAndStartRecording() {
-        _fabBottomSheet.update { HomeEvent.FabBottomSheet.SheetShow }
+        onFabBottomSheetShow()
         onAudioRecordStart()
     }
 }
