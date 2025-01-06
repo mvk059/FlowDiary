@@ -24,7 +24,7 @@ class AudioLocalDatasourceImpl(
     }
 
     override suspend fun getAllRecordings(): List<AudioTable.AudioData> {
-        return storage.get()?.recordings ?: emptyList()
+        return storage.get()?.recordings?.map { it.copy(path = getRecordingPath(it)) } ?: emptyList()
     }
 
     override suspend fun deleteRecordings(memes: List<AudioTable.AudioData>) {
