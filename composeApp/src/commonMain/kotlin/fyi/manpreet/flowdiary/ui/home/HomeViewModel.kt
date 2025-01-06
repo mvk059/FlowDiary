@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 class HomeViewModel(
     private val audioPlayer: AudioPlayer, // TODO Use case
@@ -207,19 +206,26 @@ class HomeViewModel(
         }
     }
 
-    @OptIn(ExperimentalResourceApi::class)
     private fun onPlay(id: Long) {
-        _homeState.value.recordings
-            .filterIsInstance<Recordings.Entry>()
-            .forEach { recordingState ->
-                recordingState.recordings.find { it.id == id }?.let { audio ->
-                    val path = requireNotNull(audio.path) { "Audio path is null." }
-//                    audioPlayer.play(path.value)
-                    val sound = path.value.substringBeforeLast("/") + "/sound.mp3"
-//                    audioPlayer.play(Res.getUri("files/sound.mp3"))
-                    audioPlayer.play(sound)
+        var audioPath = ""
+        val updatedRecordings = _homeState.value.recordings.map { recording ->
+            when (recording) {
+                is Recordings.Date -> recording
+                is Recordings.Entry -> {
+                    val updatedAudioList = recording.recordings.map { audio ->
+                        if (audio.id == id) {
+                            audioPath = audio.path?.value?.substringBeforeLast("/") + "/sound.mp3"
+                            audio.copy(isPlaying = true)
+                        } else {
+                            audio.copy(isPlaying = false)
+                        }
+                    }
+                    recording.copy(recordings = updatedAudioList)
                 }
             }
+        }
+        audioPlayer.play(audioPath)
+        _homeState.update { it.copy(recordings = updatedRecordings) }
     }
 
     private fun onPause(id: Long) {

@@ -70,7 +70,6 @@ fun AudioEntryContentItem(
             }
 
             // Seekbar
-            var isPlaying by remember { mutableStateOf(false) }
             var currentPosition by remember { mutableStateOf(30f) }
             val totalDuration = 750f // 12:30 in seconds
 
@@ -78,13 +77,12 @@ fun AudioEntryContentItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(0.dp),
-                isPlaying = isPlaying,
+                isPlaying = recording.isPlaying,
                 currentPosition = currentPosition,
                 totalDuration = totalDuration,
                 onPlayPauseClick = {
-                    if (isPlaying) onAudioPlayerEvent(HomeEvent.AudioPlayer.Pause(recording.id))
+                    if (recording.isPlaying) onAudioPlayerEvent(HomeEvent.AudioPlayer.Pause(recording.id))
                     else onAudioPlayerEvent(HomeEvent.AudioPlayer.Play(recording.id))
-                    isPlaying = !isPlaying
                 },
                 onSeek = { newPosition ->
                     currentPosition = newPosition
