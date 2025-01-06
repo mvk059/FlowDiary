@@ -205,6 +205,7 @@ class NewRecordViewModel(
                 emotionType = emotionType,
                 topics = data.selectedTopics.toList(),
                 description = data.description,
+                isPlaying = false,
             )
             repository.insertRecording(audio)
             onNavigateBack()

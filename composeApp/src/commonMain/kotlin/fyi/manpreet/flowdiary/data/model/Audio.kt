@@ -12,6 +12,7 @@ data class Audio(
     val emotionType: EmotionType,
     val topics: List<Topic>,
     val description: String,
+    val isPlaying: Boolean,
 ) {
 
     companion object {

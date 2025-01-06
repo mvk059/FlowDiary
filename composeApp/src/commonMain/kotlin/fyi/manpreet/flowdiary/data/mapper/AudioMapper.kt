@@ -44,7 +44,8 @@ fun AudioTable.AudioData.toAudio(): Audio {
         title = title,
         topics = topics.toTopics(),
         description = description,
-        emotionType = emotionType
+        emotionType = emotionType,
+        isPlaying = false,
     )
 }
 
