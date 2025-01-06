@@ -111,6 +111,7 @@ fun HomeScreen(
         onMoodChipReset = viewModel::onEvent,
         onTopicChipReset = viewModel::onEvent,
         onAudioEvent = viewModel::onEvent,
+        onAudioPlayerEvent = viewModel::onEvent,
         onBottomSheetShow = viewModel::onEvent,
         onBottomSheetDismiss = viewModel::onEvent,
         onSettingsClick = onSettingsClick,
@@ -130,6 +131,7 @@ fun HomeScreenContent(
     onMoodChipReset: (HomeEvent.Chip) -> Unit,
     onTopicChipReset: (HomeEvent.Chip) -> Unit,
     onAudioEvent: (HomeEvent.AudioRecorder) -> Unit,
+    onAudioPlayerEvent: (HomeEvent.AudioPlayer) -> Unit,
     onBottomSheetShow: (HomeEvent.FabBottomSheet) -> Unit,
     onBottomSheetDismiss: (HomeEvent.FabBottomSheet) -> Unit,
     onSettingsClick: () -> Unit,
@@ -185,7 +187,13 @@ fun HomeScreenContent(
                             item.recordings.forEachIndexed { index, recording ->
                                 TimelineItem(
                                     isLastItem = index == item.recordings.lastIndex,
-                                    content = { modifier -> AudioEntryContentItem(modifier, recording) }
+                                    content = { modifier ->
+                                        AudioEntryContentItem(
+                                            modifier = modifier,
+                                            recording = recording,
+                                            onAudioPlayerEvent = onAudioPlayerEvent
+                                        )
+                                    }
                                 )
                             }
                         }

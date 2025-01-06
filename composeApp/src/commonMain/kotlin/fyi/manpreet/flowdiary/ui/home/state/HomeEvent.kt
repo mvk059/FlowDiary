@@ -23,6 +23,11 @@ sealed interface HomeEvent {
         data object Done : AudioRecorder
     }
 
+    sealed interface AudioPlayer : HomeEvent {
+        data class Play(val id: Long) : AudioPlayer
+        data class Pause(val id: Long) : AudioPlayer
+    }
+
     sealed interface Permission : HomeEvent {
         data class Settings(val type: fyi.manpreet.flowdiary.platform.permission.Permission) : Permission
         data object Close : Permission

@@ -20,6 +20,7 @@ import fyi.manpreet.flowdiary.platform.permission.service.PermissionService
 import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.home.state.HomeState
+import fyi.manpreet.flowdiary.ui.home.state.Recordings
 import fyi.manpreet.flowdiary.util.toRecordingList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 class HomeViewModel(
     private val audioPlayer: AudioPlayer, // TODO Use case
@@ -68,13 +70,15 @@ class HomeViewModel(
             HomeEvent.FabBottomSheet.FabClick -> viewModelScope.launch { checkPermission() }
             HomeEvent.FabBottomSheet.SheetShow -> onFabBottomSheetShow()
             HomeEvent.FabBottomSheet.SheetHide -> onFabBottomSheetHide()
+            HomeEvent.Permission.Close -> _permissionStatus.update { PermissionState.NOT_DETERMINED }
+            is HomeEvent.Permission.Settings -> openSettingsPage(event.type)
             HomeEvent.AudioRecorder.Idle -> onAudioRecordIdle()
             HomeEvent.AudioRecorder.Record -> onAudioRecordStart()
             HomeEvent.AudioRecorder.Pause -> onAudioRecordPause()
             HomeEvent.AudioRecorder.Cancel -> onAudioRecordCancel()
             HomeEvent.AudioRecorder.Done -> onAudioRecordDone()
-            HomeEvent.Permission.Close -> _permissionStatus.update { PermissionState.NOT_DETERMINED }
-            is HomeEvent.Permission.Settings -> openSettingsPage(event.type)
+            is HomeEvent.AudioPlayer.Play -> onPlay(event.id)
+            is HomeEvent.AudioPlayer.Pause -> onPause(event.id)
             HomeEvent.Reload -> onReload()
         }
     }
@@ -201,6 +205,25 @@ class HomeViewModel(
             Logger.i { "Audio recording done: $filePath" }
             _homeState.update { it.copy(recordingPath = AudioPath(filePath)) }
         }
+    }
+
+    @OptIn(ExperimentalResourceApi::class)
+    private fun onPlay(id: Long) {
+        _homeState.value.recordings
+            .filterIsInstance<Recordings.Entry>()
+            .forEach { recordingState ->
+                recordingState.recordings.find { it.id == id }?.let { audio ->
+                    val path = requireNotNull(audio.path) { "Audio path is null." }
+//                    audioPlayer.play(path.value)
+                    val sound = path.value.substringBeforeLast("/") + "/sound.mp3"
+//                    audioPlayer.play(Res.getUri("files/sound.mp3"))
+                    audioPlayer.play(sound)
+                }
+            }
+    }
+
+    private fun onPause(id: Long) {
+        audioPlayer.stop()
     }
 
     private suspend fun checkPermission() {
