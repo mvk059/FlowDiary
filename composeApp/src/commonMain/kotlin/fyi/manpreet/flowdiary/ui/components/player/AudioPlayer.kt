@@ -24,12 +24,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
+import fyi.manpreet.flowdiary.util.getBackgroundColor
 import fyi.manpreet.flowdiary.util.noRippleClickable
 
 @Composable
 fun AudioPlayer(
     modifier: Modifier = Modifier,
     isPlaying: Boolean,
+    emotionType: EmotionType,
     currentPosition: Float, // in seconds
     totalDuration: Float, // in seconds
     onPlayPauseClick: () -> Unit,
@@ -39,7 +42,7 @@ fun AudioPlayer(
         modifier = modifier
             .wrapContentSize()
             .clip(RoundedCornerShape(24.dp))
-            .background(Color(0xFFEEF7F3))
+            .background(emotionType.getBackgroundColor())
             .padding(4.dp)
     ) {
         Row(
@@ -57,7 +60,7 @@ fun AudioPlayer(
                 Icon(
                     imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                     contentDescription = if (isPlaying) "Pause" else "Play",
-                    tint = Color(0xFF41B278)
+                    tint = emotionType.getBackgroundColor()
                 )
             }
 

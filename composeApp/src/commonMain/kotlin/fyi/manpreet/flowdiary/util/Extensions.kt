@@ -7,9 +7,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.graphics.Color
 import com.composables.core.SheetDetent
 import fyi.manpreet.flowdiary.data.model.Audio
+import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.ui.home.state.Recordings
+import fyi.manpreet.flowdiary.ui.theme.Excited95
+import fyi.manpreet.flowdiary.ui.theme.Neutral95
+import fyi.manpreet.flowdiary.ui.theme.Peaceful95
+import fyi.manpreet.flowdiary.ui.theme.Sad95
+import fyi.manpreet.flowdiary.ui.theme.Stressed95
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -47,4 +54,14 @@ fun List<Audio>.toRecordingList(): List<Recordings> {
                 Recordings.Entry(audioList)
             )
         }
+}
+
+fun EmotionType.getBackgroundColor(): Color {
+    return when (this) {
+        EmotionType.Excited -> Excited95
+        EmotionType.Peaceful -> Peaceful95
+        EmotionType.Neutral -> Neutral95
+        EmotionType.Sad -> Sad95
+        EmotionType.Stressed -> Stressed95
+    }
 }

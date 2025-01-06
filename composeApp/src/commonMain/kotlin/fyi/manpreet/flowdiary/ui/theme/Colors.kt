@@ -37,6 +37,12 @@ val Secondary90 = Color(0xFFD9E2FF)
 val Secondary95 = Color(0xFFEEF0FF)
 val FabShadow = Color(0x4D1B6EF3)
 
+val Excited95 = Color(0xFFF5F2EF)
+val Peaceful95 = Color(0xFFF6F2F5)
+val Neutral95 = Color(0xFFEEF7F3)
+val Sad95 = Color(0xFFEFF4F8)
+val Stressed95 = Color(0xFFF8EFEF)
+
 internal val ColorScheme = lightColorScheme(
     primary = Primary,
     primaryContainer = PrimaryContainer,

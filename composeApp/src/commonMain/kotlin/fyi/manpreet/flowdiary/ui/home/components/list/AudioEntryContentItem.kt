@@ -78,6 +78,7 @@ fun AudioEntryContentItem(
                     .fillMaxWidth()
                     .padding(0.dp),
                 isPlaying = recording.isPlaying,
+                emotionType = recording.emotionType,
                 currentPosition = currentPosition,
                 totalDuration = totalDuration,
                 onPlayPauseClick = {
