@@ -90,8 +90,6 @@ fun AudioEntryContentItem(
                 }
             )
 
-            val sampleText =
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tit amet, consectetur adipiscing elit, sed tLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tit amet, consectetur adipiscing elit, sed t"
             ExpandableText(text = recording.description)
 
             FlowRow(

@@ -87,7 +87,6 @@ fun ChipFilter(
                                 coordinates.size.width.toFloat(),
                                 coordinates.size.height.toFloat(),
                             )
-                            println("Chip Size: $chipSize")
                             chipOffset = IntOffset(
                                 coordinates.boundsInWindow().left.toInt(),
                                 coordinates.boundsInWindow().top.toInt()
