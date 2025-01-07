@@ -60,6 +60,21 @@ class HomeViewModel(
     private val _recordingState = MutableStateFlow<HomeEvent.AudioRecorder>(HomeEvent.AudioRecorder.Idle)
     val recordingState: StateFlow<HomeEvent.AudioRecorder> = _recordingState.asStateFlow()
 
+    init {
+        audioPlayer.setOnPlaybackCompleteListener {
+            val updatedRecordings = _homeState.value.recordings.map { recording ->
+                when (recording) {
+                    is Recordings.Date -> recording
+                    is Recordings.Entry -> {
+                        val updatedAudioList = recording.recordings.map { audio -> audio.copy(isPlaying = false) }
+                        recording.copy(recordings = updatedAudioList)
+                    }
+                }
+            }
+            _homeState.update { it.copy(recordings = updatedRecordings) }
+        }
+    }
+
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.Chip.MoodChip -> onMoodChipSelect(event.id)
@@ -207,14 +222,15 @@ class HomeViewModel(
     }
 
     private fun onPlay(id: Long) {
-        var audioPath = ""
+        var audioPath: String? = ""
         val updatedRecordings = _homeState.value.recordings.map { recording ->
             when (recording) {
                 is Recordings.Date -> recording
                 is Recordings.Entry -> {
                     val updatedAudioList = recording.recordings.map { audio ->
                         if (audio.id == id) {
-                            audioPath = audio.path?.value?.substringBeforeLast("/") + "/sound.mp3"
+                            audioPath = audio.path?.value //?.substringBeforeLast("/") + "/sound.wav"
+                            Logger.i { "Audio path: $audioPath" }
                             audio.copy(isPlaying = true)
                         } else {
                             audio.copy(isPlaying = false)
@@ -224,12 +240,26 @@ class HomeViewModel(
                 }
             }
         }
-        audioPlayer.play(audioPath)
+        requireNotNull(audioPath) { "Audio path can not be null." }
+        audioPlayer.play(audioPath!!)
         _homeState.update { it.copy(recordings = updatedRecordings) }
     }
 
     private fun onPause(id: Long) {
         audioPlayer.stop()
+        val updatedRecordings = _homeState.value.recordings.map { recording ->
+            when (recording) {
+                is Recordings.Date -> recording
+                is Recordings.Entry -> {
+                    val updatedAudioList = recording.recordings.map { audio ->
+                        if (audio.id == id) audio.copy(isPlaying = false)
+                         else audio
+                    }
+                    recording.copy(recordings = updatedAudioList)
+                }
+            }
+        }
+        _homeState.update { it.copy(recordings = updatedRecordings) }
     }
 
     private suspend fun checkPermission() {
