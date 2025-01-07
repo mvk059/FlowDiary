@@ -1,11 +1,14 @@
 package fyi.manpreet.flowdiary.platform.audioplayer
 
 import android.content.ContentResolver
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import fyi.manpreet.flowdiary.usecase.MainActivityUseCase
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 actual class AudioPlayer(
     mainActivityUseCase: MainActivityUseCase,
@@ -35,9 +38,9 @@ actual class AudioPlayer(
         })
     }
 
-    actual fun play(url: String) {
+    actual fun play(path: String) {
         if (mediaPlayer.isPlaying) mediaPlayer.pause()
-        val mediaItem = MediaItem.fromUri(url)
+        val mediaItem = MediaItem.fromUri(path)
         mediaPlayer.setMediaItem(mediaItem)
         mediaPlayer.play()
     }
@@ -66,5 +69,10 @@ actual class AudioPlayer(
         onPlaybackComplete = listener
     }
 
-
+    actual fun getAudioDuration(filePath: String): Duration {
+        val retriever = MediaMetadataRetriever()
+        retriever.setDataSource(filePath)
+        val durationMs = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0
+        return durationMs.milliseconds
+    }
 }
