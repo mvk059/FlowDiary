@@ -1,4 +1,4 @@
-package fyi.manpreet.flowdiary.platform.audio
+package fyi.manpreet.flowdiary.platform.audioplayer
 
 import android.content.ContentResolver
 import android.net.Uri

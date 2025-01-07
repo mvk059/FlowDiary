@@ -1,4 +1,4 @@
-package fyi.manpreet.flowdiary.platform.audio
+package fyi.manpreet.flowdiary.platform.audioplayer
 
 expect class AudioPlayer {
     fun play(url: String)

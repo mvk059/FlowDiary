@@ -12,7 +12,7 @@ import flowdiary.composeapp.generated.resources.ic_stressed
 import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.data.repository.AudioRepository
-import fyi.manpreet.flowdiary.platform.audio.AudioPlayer
+import fyi.manpreet.flowdiary.platform.audioplayer.AudioPlayer
 import fyi.manpreet.flowdiary.platform.audiorecord.AudioRecorder
 import fyi.manpreet.flowdiary.platform.permission.Permission
 import fyi.manpreet.flowdiary.platform.permission.PermissionState

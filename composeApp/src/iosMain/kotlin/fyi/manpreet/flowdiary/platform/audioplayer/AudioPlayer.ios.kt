@@ -1,4 +1,4 @@
-package fyi.manpreet.flowdiary.platform.audio
+package fyi.manpreet.flowdiary.platform.audioplayer
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AVFoundation.*
