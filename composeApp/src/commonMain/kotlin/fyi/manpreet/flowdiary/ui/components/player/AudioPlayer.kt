@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.util.getBackgroundColor
+import fyi.manpreet.flowdiary.util.getIconColor
 import fyi.manpreet.flowdiary.util.noRippleClickable
 
 @Composable
@@ -36,7 +37,7 @@ fun AudioPlayer(
     currentPosition: Float, // in seconds
     totalDuration: Float, // in seconds
     onPlayPauseClick: () -> Unit,
-    onSeek: (Float) -> Unit
+    onSeek: (Float) -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -60,7 +61,7 @@ fun AudioPlayer(
                 Icon(
                     imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                     contentDescription = if (isPlaying) "Pause" else "Play",
-                    tint = emotionType.getBackgroundColor()
+                    tint = emotionType.getIconColor()
                 )
             }
 
@@ -71,7 +72,11 @@ fun AudioPlayer(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Text("/")
+            Text(
+                text = "/",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Text(
                 text = formatDuration(totalDuration),
                 style = MaterialTheme.typography.bodySmall,
@@ -85,7 +90,7 @@ fun AudioPlayer(
 private fun AudioWaveformSeekbar(
     currentPosition: Float,
     totalDuration: Float,
-    onSeek: (Float) -> Unit
+    onSeek: (Float) -> Unit,
 ) {
     Slider(
         value = currentPosition,

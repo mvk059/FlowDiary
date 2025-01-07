@@ -11,16 +11,17 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import flowdiary.composeapp.generated.resources.Res
-import flowdiary.composeapp.generated.resources.ic_excited
+import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.ui.theme.spacing
+import fyi.manpreet.flowdiary.util.getDrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun TimelineItem(
     modifier: Modifier = Modifier,
+    emotionType: EmotionType,
     isLastItem: Boolean,
-    content: @Composable (modifier: Modifier) -> Unit
+    content: @Composable (modifier: Modifier) -> Unit,
 ) {
 
     Box(
@@ -54,7 +55,7 @@ fun TimelineItem(
         Row {
 
             Icon(
-                painter = painterResource(Res.drawable.ic_excited),
+                painter = painterResource(emotionType.getDrawableResource()),
                 contentDescription = null,
                 modifier = Modifier.padding(
                     top = MaterialTheme.spacing.smallMedium,

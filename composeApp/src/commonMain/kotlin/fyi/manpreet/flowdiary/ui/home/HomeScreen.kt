@@ -186,6 +186,7 @@ fun HomeScreenContent(
                         is Recordings.Entry -> {
                             item.recordings.forEachIndexed { index, recording ->
                                 TimelineItem(
+                                    emotionType = recording.emotionType,
                                     isLastItem = index == item.recordings.lastIndex,
                                     content = { modifier ->
                                         AudioEntryContentItem(
