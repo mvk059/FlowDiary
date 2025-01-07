@@ -4,4 +4,5 @@ expect class AudioPlayer {
     fun play(url: String)
     fun stop()
     fun release()
+    fun setOnPlaybackCompleteListener(listener: () -> Unit)
 }

@@ -3,6 +3,7 @@ package fyi.manpreet.flowdiary.platform.audioplayer
 import android.content.ContentResolver
 import android.net.Uri
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import fyi.manpreet.flowdiary.usecase.MainActivityUseCase
 
@@ -11,9 +12,27 @@ actual class AudioPlayer(
 ) {
 
     private val mediaPlayer = ExoPlayer.Builder(mainActivityUseCase.requireActivity()).build()
+    private var onPlaybackComplete: (() -> Unit)? = null
 
     init {
         mediaPlayer.prepare()
+
+        // Add listener for playback states
+        mediaPlayer.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                when (playbackState) {
+                    Player.STATE_ENDED -> {
+                        onPlaybackComplete?.invoke()
+                    }
+
+                    Player.STATE_BUFFERING -> {}
+
+                    Player.STATE_IDLE -> {}
+
+                    Player.STATE_READY -> {}
+                }
+            }
+        })
     }
 
     actual fun play(url: String) {
@@ -42,5 +61,10 @@ actual class AudioPlayer(
     actual fun stop() {
         mediaPlayer.pause()
     }
+
+    actual fun setOnPlaybackCompleteListener(listener: () -> Unit) {
+        onPlaybackComplete = listener
+    }
+
 
 }
