@@ -209,7 +209,6 @@ class NewRecordViewModel(
                 emotionType = emotionType,
                 topics = data.selectedTopics.toList(),
                 description = data.description,
-                isPlaying = false,
                 duration = audioPlayer.getAudioDuration(path.value)
             )
             repository.insertRecording(audio)
@@ -222,7 +221,6 @@ class NewRecordViewModel(
     }
 
     private fun onNavigateBack() {
-        navController.previousBackStackEntry?.savedStateHandle?.set(key = Constants.NAVIGATE_BACK_RELOAD, value = true)
         navController.popBackStack()
     }
 }
