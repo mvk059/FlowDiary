@@ -1,9 +1,11 @@
 package fyi.manpreet.flowdiary.ui.newrecord.state
 
+import androidx.compose.runtime.Stable
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.ui.components.emotion.Emotions
 import fyi.manpreet.flowdiary.ui.home.state.Topic
 
+@Stable
 data class NewRecordState(
     val title: String? = null,
     val emotionType: EmotionType? = null,
@@ -14,7 +16,7 @@ data class NewRecordState(
     val searchQuery: String = "",
     val description: String = "",
     val onBackConfirm: Boolean = false,
-    val onNavigateBack: Boolean = false,
     val isEmotionSaveButtonEnabled: Boolean = false,
     val isSaveButtonEnabled: Boolean = false,
+    val fabState: NewRecordEvent.FabBottomSheet = NewRecordEvent.FabBottomSheet.SheetHide,
 )

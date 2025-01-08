@@ -26,8 +26,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import com.composables.core.DragIndication
 import com.composables.core.ModalBottomSheet
-import com.composables.core.ModalBottomSheetState
 import com.composables.core.Sheet
+import com.composables.core.SheetDetent.Companion.Hidden
+import com.composables.core.rememberModalBottomSheetState
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.common_cancel
 import flowdiary.composeapp.generated.resources.common_confirm
@@ -39,13 +40,14 @@ import fyi.manpreet.flowdiary.ui.newrecord.components.button.ButtonDisabledNoRip
 import fyi.manpreet.flowdiary.ui.newrecord.components.button.ButtonPrimaryEnabledNoRipple
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordEvent
 import fyi.manpreet.flowdiary.ui.theme.spacing
+import fyi.manpreet.flowdiary.util.Peek
 import fyi.manpreet.flowdiary.util.noRippleClickable
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun EmotionBottomSheet(
     modifier: Modifier = Modifier,
-    sheetState: ModalBottomSheetState,
+    fabBottomSheet: NewRecordEvent.FabBottomSheet?,
     emotions: List<Emotions>?,
     emotionsSaveButtonEnabled: Boolean,
     onEmotionTypeSelect: (NewRecordEvent.Data) -> Unit,
@@ -54,6 +56,14 @@ fun EmotionBottomSheet(
 
     if (emotions.isNullOrEmpty()) return
     var selectedIcon by remember { mutableStateOf<EmotionType?>(null) }
+
+    val sheetState = rememberModalBottomSheetState(
+        initialDetent = Hidden,
+        detents = listOf(Hidden, Peek)
+    )
+
+    if (fabBottomSheet == NewRecordEvent.FabBottomSheet.SheetShow) sheetState.currentDetent = Peek
+    else sheetState.currentDetent = Hidden
 
     ModalBottomSheet(
         state = sheetState,

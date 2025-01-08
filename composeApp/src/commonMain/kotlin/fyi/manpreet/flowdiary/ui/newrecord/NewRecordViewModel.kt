@@ -2,6 +2,7 @@ package fyi.manpreet.flowdiary.ui.newrecord
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.ic_excited
 import flowdiary.composeapp.generated.resources.ic_excited_outline
@@ -21,15 +22,16 @@ import flowdiary.composeapp.generated.resources.mood_stressed
 import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.data.repository.AudioRepository
+import fyi.manpreet.flowdiary.platform.audioplayer.AudioPlayer
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.ui.components.emotion.Emotions
 import fyi.manpreet.flowdiary.ui.home.state.Topic
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordEvent
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordState
+import fyi.manpreet.flowdiary.util.Constants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -37,13 +39,10 @@ import kotlinx.coroutines.launch
 
 class NewRecordViewModel(
     private val repository: AudioRepository,
+    private val audioPlayer: AudioPlayer,
 ) : ViewModel() {
 
     private val _recordingPath = MutableStateFlow<AudioPath?>(null)
-    val recordingPath: StateFlow<AudioPath?> = _recordingPath.asStateFlow()
-
-    private val _recordingState = MutableStateFlow<Audio?>(null)
-    val recordingState: StateFlow<Audio?> = _recordingState.asStateFlow()
 
     private val _newRecordState = MutableStateFlow<NewRecordState?>(NewRecordState())
     val newRecordState: StateFlow<NewRecordState?> = _newRecordState
@@ -54,12 +53,11 @@ class NewRecordViewModel(
             initialValue = NewRecordState()
         )
 
-    private val _fabBottomSheet =
-        MutableStateFlow<NewRecordEvent.FabBottomSheet>(NewRecordEvent.FabBottomSheet.SheetHide)
-    val fabBottomSheet: StateFlow<NewRecordEvent.FabBottomSheet> = _fabBottomSheet.asStateFlow()
+    private lateinit var navController: NavController
 
-    fun savePath(path: AudioPath) {
+    fun savePath(path: AudioPath, navController: NavController) {
         _recordingPath.update { path }
+        this.navController = navController
     }
 
     fun onEvent(event: NewRecordEvent) {
@@ -147,23 +145,27 @@ class NewRecordViewModel(
     }
 
     private fun onEmotionSave(emotionType: EmotionType) {
-        _newRecordState.update { state -> state?.copy(emotionType = emotionType) }
-        _fabBottomSheet.update { NewRecordEvent.FabBottomSheet.SheetHide }
+        _newRecordState.update { state ->
+            state?.copy(
+                emotionType = emotionType,
+                fabState = NewRecordEvent.FabBottomSheet.SheetHide
+            )
+        }
         updateSaveButtonState()
     }
 
     private fun onShowBottomSheet() {
-        _fabBottomSheet.update { NewRecordEvent.FabBottomSheet.SheetShow }
+        _newRecordState.update { it?.copy(fabState = NewRecordEvent.FabBottomSheet.SheetShow) }
     }
 
     private fun onHideBottomSheet() {
-        _fabBottomSheet.update { NewRecordEvent.FabBottomSheet.SheetHide }
         _newRecordState.update { state ->
             state?.copy(
                 emotions = state.emotions.map { emotion ->
                     if (emotion.type == state.emotionType) emotion.copy(isSelected = true)
                     else emotion.copy(isSelected = false)
                 },
+                fabState = NewRecordEvent.FabBottomSheet.SheetHide,
             )
         }
         updateSaveButtonState()
@@ -195,17 +197,20 @@ class NewRecordViewModel(
             requireNotNull(data) { "Data is null" }
             val title = data.title
             val emotionType = data.emotionType
+            val path = _recordingPath.value
             requireNotNull(title) { "Title is null" }
             requireNotNull(emotionType) { "EmotionType is null" }
+            requireNotNull(path) { "Path is null" }
             val audio = Audio(
                 id = Audio.INVALID_ID,
-                path = _recordingPath.value,
+                path = path,
                 createdDateInMillis = 0L,
                 title = title,
                 emotionType = emotionType,
                 topics = data.selectedTopics.toList(),
                 description = data.description,
                 isPlaying = false,
+                duration = audioPlayer.getAudioDuration(path.value)
             )
             repository.insertRecording(audio)
             onNavigateBack()
@@ -217,6 +222,7 @@ class NewRecordViewModel(
     }
 
     private fun onNavigateBack() {
-        _newRecordState.update { state -> state?.copy(onNavigateBack = true) }
+        navController.previousBackStackEntry?.savedStateHandle?.set(key = Constants.NAVIGATE_BACK_RELOAD, value = true)
+        navController.popBackStack()
     }
 }

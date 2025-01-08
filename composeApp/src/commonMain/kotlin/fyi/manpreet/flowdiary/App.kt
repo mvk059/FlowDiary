@@ -14,7 +14,6 @@ import fyi.manpreet.flowdiary.ui.home.HomeScreen
 import fyi.manpreet.flowdiary.ui.newrecord.NewRecordScreen
 import fyi.manpreet.flowdiary.ui.settings.SettingsScreen
 import fyi.manpreet.flowdiary.ui.theme.FlowTheme
-import fyi.manpreet.flowdiary.util.Constants
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -32,12 +31,8 @@ fun App(
             composable<HomeDestination> {
                 HomeScreen(
                     navController = navController,
-                    onNewRecordClick = { path ->
-                        navController.navigate(NewRecordDestination(path = path.value))
-                    },
-                    onSettingsClick = {
-                        navController.navigate(SettingsDestination)
-                    }
+                    onNewRecordClick = { path -> navController.navigate(NewRecordDestination(path = path.value)) },
+                    onSettingsClick = { navController.navigate(SettingsDestination) }
                 )
             }
 
@@ -46,13 +41,6 @@ fun App(
                 NewRecordScreen(
                     navController = navController,
                     path = AudioPath(args.path),
-                    onBackClick = {
-                        navController.previousBackStackEntry?.savedStateHandle?.set(
-                            key = Constants.NAVIGATE_BACK_RELOAD,
-                            value = true
-                        )
-                        navController.popBackStack()
-                    },
                 )
             }
 
