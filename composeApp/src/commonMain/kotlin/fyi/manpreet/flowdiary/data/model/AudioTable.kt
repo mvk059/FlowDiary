@@ -1,6 +1,7 @@
 package fyi.manpreet.flowdiary.data.model
 
 import kotlinx.serialization.Serializable
+import kotlin.time.Duration
 
 @Serializable
 data class AudioTable(
@@ -16,5 +17,6 @@ data class AudioTable(
         val emotionType: String,
         val topics: List<String>,
         val description: String,
+        val duration: Duration,
     )
 }

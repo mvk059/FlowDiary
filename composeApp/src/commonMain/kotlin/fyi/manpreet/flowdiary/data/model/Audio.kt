@@ -1,9 +1,12 @@
 package fyi.manpreet.flowdiary.data.model
 
+import androidx.compose.runtime.Stable
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.ui.home.state.Topic
 import kotlin.jvm.JvmInline
+import kotlin.time.Duration
 
+@Stable
 data class Audio(
     val id: Long = INVALID_ID,
     val path: AudioPath? = null,
@@ -12,7 +15,7 @@ data class Audio(
     val emotionType: EmotionType,
     val topics: List<Topic>,
     val description: String,
-    val isPlaying: Boolean,
+    val duration: Duration,
 ) {
 
     companion object {

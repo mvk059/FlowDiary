@@ -28,6 +28,7 @@ fun Audio.toAudioData(): AudioTable.AudioData {
         topics = topics.toTopicsString(),
         description = description,
         emotionType = emotionType.toEmotionType(),
+        duration = duration,
     )
 }
 
@@ -45,7 +46,7 @@ fun AudioTable.AudioData.toAudio(): Audio {
         topics = topics.toTopics(),
         description = description,
         emotionType = emotionType,
-        isPlaying = false,
+        duration = duration,
     )
 }
 
