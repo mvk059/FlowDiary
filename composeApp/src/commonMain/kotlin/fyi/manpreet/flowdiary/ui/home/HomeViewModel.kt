@@ -20,7 +20,9 @@ import fyi.manpreet.flowdiary.platform.permission.service.PermissionService
 import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.home.state.HomeState
+import fyi.manpreet.flowdiary.ui.home.state.PlaybackState
 import fyi.manpreet.flowdiary.ui.home.state.Recordings
+import fyi.manpreet.flowdiary.usecase.AudioPlaybackTimer
 import fyi.manpreet.flowdiary.util.toRecordingList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,10 +33,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlin.time.Duration
 
 class HomeViewModel(
     private val audioPlayer: AudioPlayer, // TODO Use case
     private val audioRecorder: AudioRecorder,
+    private val audioPlaybackTimer: AudioPlaybackTimer,
     private val permissionService: PermissionService,
     private val repository: AudioRepository,
 ) : ViewModel() {
@@ -57,21 +61,16 @@ class HomeViewModel(
             initialValue = PermissionState.NOT_DETERMINED
         )
 
-    private val _recordingState = MutableStateFlow<HomeEvent.AudioRecorder>(HomeEvent.AudioRecorder.Idle)
+    private val _recordingState =
+        MutableStateFlow<HomeEvent.AudioRecorder>(HomeEvent.AudioRecorder.Idle)
     val recordingState: StateFlow<HomeEvent.AudioRecorder> = _recordingState.asStateFlow()
+
+    private val _playbackState = MutableStateFlow(PlaybackState.NotPlaying)
+    val playbackState = _playbackState.asStateFlow()
 
     init {
         audioPlayer.setOnPlaybackCompleteListener {
-            val updatedRecordings = _homeState.value.recordings.map { recording ->
-                when (recording) {
-                    is Recordings.Date -> recording
-                    is Recordings.Entry -> {
-                        val updatedAudioList = recording.recordings.map { audio -> audio.copy(isPlaying = false) }
-                        recording.copy(recordings = updatedAudioList)
-                    }
-                }
-            }
-            _homeState.update { it.copy(recordings = updatedRecordings) }
+            onStop()
         }
     }
 
@@ -223,43 +222,28 @@ class HomeViewModel(
 
     private fun onPlay(id: Long) {
         var audioPath: String? = ""
-        val updatedRecordings = _homeState.value.recordings.map { recording ->
+        _homeState.value.recordings.map { recording ->
             when (recording) {
                 is Recordings.Date -> recording
                 is Recordings.Entry -> {
-                    val updatedAudioList = recording.recordings.map { audio ->
-                        if (audio.id == id) {
-                            audioPath = audio.path?.value //?.substringBeforeLast("/") + "/sound.wav"
-                            Logger.i { "Audio path: $audioPath" }
-                            audio.copy(isPlaying = true)
-                        } else {
-                            audio.copy(isPlaying = false)
-                        }
+                    recording.recordings.forEach { audio ->
+                        if (audio.id == id) audioPath = audio.path?.value
                     }
-                    recording.copy(recordings = updatedAudioList)
                 }
             }
         }
         requireNotNull(audioPath) { "Audio path can not be null." }
         audioPlayer.play(audioPath!!)
-        _homeState.update { it.copy(recordings = updatedRecordings) }
+        _playbackState.update { PlaybackState(playingId = id, position = Duration.ZERO) }
     }
 
     private fun onPause(id: Long) {
         audioPlayer.stop()
-        val updatedRecordings = _homeState.value.recordings.map { recording ->
-            when (recording) {
-                is Recordings.Date -> recording
-                is Recordings.Entry -> {
-                    val updatedAudioList = recording.recordings.map { audio ->
-                        if (audio.id == id) audio.copy(isPlaying = false)
-                         else audio
-                    }
-                    recording.copy(recordings = updatedAudioList)
-                }
-            }
-        }
-        _homeState.update { it.copy(recordings = updatedRecordings) }
+        _playbackState.update { PlaybackState.NotPlaying }
+    }
+
+    private fun onStop() {
+        _playbackState.update { PlaybackState.NotPlaying }
     }
 
     private suspend fun checkPermission() {

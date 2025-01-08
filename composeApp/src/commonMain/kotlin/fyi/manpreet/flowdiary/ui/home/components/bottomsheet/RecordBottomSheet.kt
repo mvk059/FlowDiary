@@ -27,8 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.composables.core.DragIndication
 import com.composables.core.ModalBottomSheet
-import com.composables.core.ModalBottomSheetState
 import com.composables.core.Sheet
+import com.composables.core.SheetDetent.Companion.Hidden
+import com.composables.core.rememberModalBottomSheetState
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.close_cd
 import flowdiary.composeapp.generated.resources.play_cd
@@ -36,16 +37,26 @@ import flowdiary.composeapp.generated.resources.record_bottom_sheet_recording
 import fyi.manpreet.flowdiary.ui.home.components.fab.GradientFAB
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.theme.spacing
+import fyi.manpreet.flowdiary.util.Peek
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun RecordBottomSheet(
     modifier: Modifier = Modifier,
-    sheetState: ModalBottomSheetState,
+    fabState: HomeEvent.FabBottomSheet,
     audioEvent: HomeEvent.AudioRecorder,
     onAudioEvent: (HomeEvent.AudioRecorder) -> Unit,
     onDismiss: (HomeEvent.FabBottomSheet) -> Unit,
 ) {
+
+    val sheetState = rememberModalBottomSheetState(
+        initialDetent = Hidden,
+        detents = listOf(Hidden, Peek)
+    )
+
+    if (fabState == HomeEvent.FabBottomSheet.SheetShow) sheetState.currentDetent = Peek
+    else sheetState.currentDetent = Hidden
+
 
     ModalBottomSheet(
         state = sheetState,
@@ -147,7 +158,9 @@ fun RecordBottomSheet(
                                 )
                                 .size(MaterialTheme.spacing.large2XL),
                             onClick = {
-                                if (audioEvent == HomeEvent.AudioRecorder.Pause) onAudioEvent(HomeEvent.AudioRecorder.Done)
+                                if (audioEvent == HomeEvent.AudioRecorder.Pause) onAudioEvent(
+                                    HomeEvent.AudioRecorder.Done
+                                )
                                 else onAudioEvent(HomeEvent.AudioRecorder.Pause)
                             },
                             content = {

@@ -30,7 +30,6 @@ fun App(
 
             composable<HomeDestination> {
                 HomeScreen(
-                    navController = navController,
                     onNewRecordClick = { path -> navController.navigate(NewRecordDestination(path = path.value)) },
                     onSettingsClick = { navController.navigate(SettingsDestination) }
                 )

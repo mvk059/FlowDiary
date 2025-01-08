@@ -14,25 +14,23 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.ui.components.player.AudioPlayer
 import fyi.manpreet.flowdiary.ui.home.components.chips.TopicChip
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.theme.spacing
+import kotlin.time.Duration
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AudioEntryContentItem(
     modifier: Modifier = Modifier,
     recording: Audio,
+    currentPosition: Duration,
     onAudioPlayerEvent: (HomeEvent.AudioPlayer) -> Unit,
+    isPlaying: Boolean,
 ) {
 
     Card(
@@ -69,35 +67,29 @@ fun AudioEntryContentItem(
                 )
             }
 
-            // Seekbar
-            var currentPosition by remember { mutableStateOf(30f) }
-            val totalDuration = 750f // 12:30 in seconds
-
             AudioPlayer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(0.dp),
-                isPlaying = recording.isPlaying,
+                modifier = Modifier.fillMaxWidth(),
+                isPlaying = isPlaying,
                 emotionType = recording.emotionType,
                 currentPosition = currentPosition,
-                totalDuration = totalDuration,
+                totalDuration = recording.duration,
                 onPlayPauseClick = {
-                    if (recording.isPlaying) onAudioPlayerEvent(HomeEvent.AudioPlayer.Pause(recording.id))
+                    if (isPlaying) onAudioPlayerEvent(HomeEvent.AudioPlayer.Pause(recording.id))
                     else onAudioPlayerEvent(HomeEvent.AudioPlayer.Play(recording.id))
                 },
-                onSeek = { newPosition ->
-                    currentPosition = newPosition
-                }
+                onSeek = {}
             )
 
-            ExpandableText(text = recording.description)
+            if (recording.description.isNotEmpty()) ExpandableText(text = recording.description)
 
-            FlowRow(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                recording.topics.forEach { topic ->
-                    TopicChip(topic = topic.value)
-                    Spacer(Modifier.width(MaterialTheme.spacing.small))
+            if (recording.topics.isNotEmpty()) {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    recording.topics.forEach { topic ->
+                        TopicChip(topic = topic.value)
+                        Spacer(Modifier.width(MaterialTheme.spacing.small))
+                    }
                 }
             }
         }
