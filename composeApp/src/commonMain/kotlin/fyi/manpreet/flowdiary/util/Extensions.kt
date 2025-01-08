@@ -32,6 +32,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.DrawableResource
+import kotlin.time.Duration
 
 val Peek = SheetDetent(identifier = "peek") { containerHeight, sheetHeight ->
     containerHeight * 0.3f
@@ -66,6 +67,18 @@ fun List<Audio>.toRecordingList(): List<Recordings> {
                 Recordings.Entry(audioList)
             )
         }
+}
+
+fun Duration.formatDuration(): String {
+    val seconds = (inWholeSeconds % 60).toString().padStart(2, '0')
+    val minutes = (inWholeMinutes % 60).toString().padStart(2, '0')
+    val hours = inWholeHours.toString().padStart(2, '0')
+    val wholeHours = inWholeHours
+
+    return when {
+        wholeHours > 0 -> "$hours:$minutes:$seconds"
+        else -> "$minutes:$seconds"
+    }
 }
 
 fun EmotionType.getDrawableResource(): DrawableResource {

@@ -19,26 +19,34 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
+import fyi.manpreet.flowdiary.util.formatDuration
 import fyi.manpreet.flowdiary.util.getBackgroundColor
 import fyi.manpreet.flowdiary.util.getIconColor
 import fyi.manpreet.flowdiary.util.noRippleClickable
+import kotlin.time.Duration
 
 @Composable
 fun AudioPlayer(
     modifier: Modifier = Modifier,
     isPlaying: Boolean,
     emotionType: EmotionType,
-    currentPosition: Float, // in seconds
-    totalDuration: Float, // in seconds
+    currentPosition: Duration, // in seconds
+    totalDuration: Duration, // in seconds
     onPlayPauseClick: () -> Unit,
     onSeek: (Float) -> Unit,
 ) {
+
+    val formattedTime by remember(currentPosition) { derivedStateOf { currentPosition.formatDuration() } }
+
     Column(
         modifier = modifier
             .wrapContentSize()
@@ -68,7 +76,7 @@ fun AudioPlayer(
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text = formatDuration(currentPosition),
+                text = formattedTime,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -78,7 +86,7 @@ fun AudioPlayer(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = formatDuration(totalDuration),
+                text = totalDuration.formatDuration(),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
