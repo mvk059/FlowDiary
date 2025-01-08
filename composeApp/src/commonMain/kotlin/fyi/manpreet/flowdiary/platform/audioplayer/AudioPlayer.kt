@@ -8,4 +8,6 @@ expect class AudioPlayer {
     fun release()
     fun setOnPlaybackCompleteListener(listener: () -> Unit)
     fun getAudioDuration(filePath: String): Duration
+    fun getCurrentPosition(): Duration
+    fun seekTo(position: Duration)
 }

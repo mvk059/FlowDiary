@@ -9,9 +9,12 @@ import platform.AVFoundation.AVPlayer
 import platform.AVFoundation.AVPlayerItemDidPlayToEndTimeNotification
 import platform.AVFoundation.AVURLAsset
 import platform.AVFoundation.currentItem
+import platform.AVFoundation.currentTime
 import platform.AVFoundation.pause
 import platform.AVFoundation.play
+import platform.AVFoundation.seekToTime
 import platform.CoreMedia.CMTimeGetSeconds
+import platform.CoreMedia.CMTimeMakeWithSeconds
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSURL
 import platform.darwin.NSObjectProtocol
@@ -87,6 +90,23 @@ actual class AudioPlayer {
         playerItemObserver?.let { observer ->
             NSNotificationCenter.defaultCenter.removeObserver(observer)
             playerItemObserver = null
+        }
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    actual fun getCurrentPosition(): Duration {
+        return player?.let {
+            val seconds = CMTimeGetSeconds(it.currentTime())
+            (seconds * 1000).toLong().milliseconds
+        } ?: Duration.ZERO
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    actual fun seekTo(position: Duration) {
+        player?.let {
+            val seconds = position.inWholeMilliseconds / 1000.0
+            val time = CMTimeMakeWithSeconds(seconds, 1000)
+            it.seekToTime(time)
         }
     }
 }

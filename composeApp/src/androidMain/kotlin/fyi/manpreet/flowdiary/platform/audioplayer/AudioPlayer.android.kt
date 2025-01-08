@@ -75,4 +75,16 @@ actual class AudioPlayer(
         val durationMs = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0
         return durationMs.milliseconds
     }
+
+    actual fun getCurrentPosition(): Duration {
+        return if (mediaPlayer.isPlaying) {
+            mediaPlayer.currentPosition.milliseconds
+        } else {
+            Duration.ZERO
+        }
+    }
+
+    actual fun seekTo(position: Duration) {
+        mediaPlayer.seekTo(position.inWholeMilliseconds)
+    }
 }
