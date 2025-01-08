@@ -6,7 +6,8 @@ import kotlin.time.Duration
 @Stable
 data class PlaybackState(
     val playingId: Long?,
-    val position: Duration
+    val position: Duration,
+    val isSeeking: Boolean = false,
 ) {
     companion object {
         val NotPlaying = PlaybackState(null, Duration.ZERO)

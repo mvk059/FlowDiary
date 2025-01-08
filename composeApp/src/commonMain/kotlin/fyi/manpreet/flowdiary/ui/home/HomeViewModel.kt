@@ -22,8 +22,9 @@ import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.home.state.HomeState
 import fyi.manpreet.flowdiary.ui.home.state.PlaybackState
 import fyi.manpreet.flowdiary.ui.home.state.Recordings
-import fyi.manpreet.flowdiary.usecase.AudioPlaybackTimer
 import fyi.manpreet.flowdiary.util.toRecordingList
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -31,14 +32,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 class HomeViewModel(
     private val audioPlayer: AudioPlayer, // TODO Use case
     private val audioRecorder: AudioRecorder,
-    private val audioPlaybackTimer: AudioPlaybackTimer,
     private val permissionService: PermissionService,
     private val repository: AudioRepository,
 ) : ViewModel() {
@@ -67,6 +69,8 @@ class HomeViewModel(
 
     private val _playbackState = MutableStateFlow(PlaybackState.NotPlaying)
     val playbackState = _playbackState.asStateFlow()
+
+    private var playbackJob: Job? = null
 
     init {
         audioPlayer.setOnPlaybackCompleteListener {
@@ -99,6 +103,7 @@ class HomeViewModel(
     override fun onCleared() {
         super.onCleared()
         audioPlayer.release()
+        playbackJob?.cancel()
     }
 
     private fun initHomeState() {
@@ -221,6 +226,7 @@ class HomeViewModel(
     }
 
     private fun onPlay(id: Long) {
+        playbackJob?.cancel()
         var audioPath: String? = ""
         _homeState.value.recordings.map { recording ->
             when (recording) {
@@ -235,15 +241,45 @@ class HomeViewModel(
         requireNotNull(audioPath) { "Audio path can not be null." }
         audioPlayer.play(audioPath!!)
         _playbackState.update { PlaybackState(playingId = id, position = Duration.ZERO) }
+        startPositionUpdates(id)
     }
 
     private fun onPause(id: Long) {
         audioPlayer.stop()
+        playbackJob?.cancel()
         _playbackState.update { PlaybackState.NotPlaying }
     }
 
     private fun onStop() {
+        playbackJob?.cancel()
         _playbackState.update { PlaybackState.NotPlaying }
+    }
+
+    private fun startPositionUpdates(id: Long) {
+        playbackJob?.cancel()
+        playbackJob = viewModelScope.launch {
+            while (isActive) {
+                if (_playbackState.value.playingId == id && !_playbackState.value.isSeeking) {
+                    val currentPosition = audioPlayer.getCurrentPosition()
+                    Logger.i { "Current : $currentPosition, $id" }
+                    _playbackState.update { it.copy(position = audioPlayer.getCurrentPosition()) }
+                }
+                delay(100) // Update every 100ms
+            }
+        }
+    }
+
+    private fun onSeek(id: Long, position: Float) {
+        viewModelScope.launch {
+            _playbackState.update { it.copy(isSeeking = true) }
+            audioPlayer.seekTo(position.toLong().milliseconds)
+            _playbackState.update {
+                it.copy(
+                    position = audioPlayer.getCurrentPosition(),
+                    isSeeking = false
+                )
+            }
+        }
     }
 
     private suspend fun checkPermission() {

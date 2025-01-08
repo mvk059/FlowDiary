@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -147,7 +147,7 @@ private fun RecordingsList(
     onTopicChipItemSelect: (HomeEvent.Chip) -> Unit,
     onMoodChipReset: (HomeEvent.Chip) -> Unit,
     onTopicChipReset: (HomeEvent.Chip) -> Unit,
-    onAudioPlayerEvent: (HomeEvent.AudioPlayer) -> Unit
+    onAudioPlayerEvent: (HomeEvent.AudioPlayer) -> Unit,
 ) {
     Column(modifier = modifier) {
         FilterScreen(
@@ -160,23 +160,31 @@ private fun RecordingsList(
         )
 
         LazyColumn {
-            recordings.forEachIndexed { index, recording ->
+            recordings.forEach { recording ->
                 when (recording) {
                     is Recordings.Date -> {
                         item { DateHeader(date = recording.date) }
                     }
+
                     is Recordings.Entry -> {
-                        items(
+                        itemsIndexed(
                             items = recording.recordings,
-                            key = { it.id }
-                        ) { audio ->
+                            key = { _, it -> it.id }
+                        ) { index, audio ->
                             val isPlaying = remember(playbackState.value.playingId) {
                                 playbackState.value.playingId == audio.id
+                            }
+                            val currentPosition = remember(
+                                playbackState.value.playingId,
+                                playbackState.value.position
+                            ) {
+                                if (playbackState.value.playingId == audio.id) playbackState.value.position
+                                else Duration.ZERO
                             }
                             AudioItem(
                                 audio = audio,
                                 isPlaying = isPlaying,
-                                currentPosition = playbackState.value.position,
+                                currentPosition = currentPosition,
                                 isLastIndex = index == recording.recordings.lastIndex,
                                 onAudioPlayerEvent = onAudioPlayerEvent,
                             )
@@ -191,7 +199,7 @@ private fun RecordingsList(
 @Composable
 private fun DateHeader(
     date: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Text(
         text = date,
@@ -213,7 +221,7 @@ private fun AudioItem(
     isPlaying: Boolean,
     isLastIndex: Boolean,
     currentPosition: Duration,
-    onAudioPlayerEvent: (HomeEvent.AudioPlayer) -> Unit
+    onAudioPlayerEvent: (HomeEvent.AudioPlayer) -> Unit,
 ) {
     TimelineItem(
         emotionType = audio.emotionType,
