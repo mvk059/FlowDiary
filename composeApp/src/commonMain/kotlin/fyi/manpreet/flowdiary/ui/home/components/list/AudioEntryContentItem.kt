@@ -69,6 +69,7 @@ fun AudioEntryContentItem(
 
             AudioPlayer(
                 modifier = Modifier.fillMaxWidth(),
+                amplitudeData = recording.amplitudeData,
                 isPlaying = isPlaying,
                 emotionType = recording.emotionType,
                 currentPosition = currentPosition,
