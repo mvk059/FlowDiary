@@ -30,7 +30,14 @@ fun App(
 
             composable<HomeDestination> {
                 HomeScreen(
-                    onNewRecordClick = { path -> navController.navigate(NewRecordDestination(path = path.value)) },
+                    onNewRecordClick = { path, amplitudePath ->
+                        navController.navigate(
+                            NewRecordDestination(
+                                audioRecordingPath = path.value,
+                                audioAmplitudePath = amplitudePath
+                            )
+                        )
+                    },
                     onSettingsClick = { navController.navigate(SettingsDestination) }
                 )
             }
@@ -39,7 +46,8 @@ fun App(
                 val args = it.toRoute<NewRecordDestination>()
                 NewRecordScreen(
                     navController = navController,
-                    path = AudioPath(args.path),
+                    path = AudioPath(args.audioRecordingPath),
+                    amplitudePath =  args.audioAmplitudePath,
                 )
             }
 

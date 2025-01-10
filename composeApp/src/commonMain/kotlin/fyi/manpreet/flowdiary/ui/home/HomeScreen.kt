@@ -38,7 +38,7 @@ import kotlin.time.Duration
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
-    onNewRecordClick: (AudioPath) -> Unit,
+    onNewRecordClick: (AudioPath, String) -> Unit,
     onSettingsClick: () -> Unit,
 ) {
     val homeState = viewModel.homeState.collectAsStateWithLifecycle()
@@ -49,8 +49,10 @@ fun HomeScreen(
     if (recordingState.value == HomeEvent.AudioRecorder.Done) {
         viewModel.onEvent(HomeEvent.AudioRecorder.Idle)
         val path = homeState.value.recordingPath
+        val amplitudeData = homeState.value.amplitudePath
         requireNotNull(path) { "Recording path is null." }
-        onNewRecordClick(path)
+        requireNotNull(amplitudeData) { "amplitudeData path is null." }
+        onNewRecordClick(path, amplitudeData)
     }
 
     HomeScreenContent(

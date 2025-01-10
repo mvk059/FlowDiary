@@ -12,6 +12,7 @@ data class HomeState(
     val topicsChip: FilterOption? = null,
     val fabBottomSheet: HomeEvent.FabBottomSheet = HomeEvent.FabBottomSheet.SheetHide,
     val recordingPath: AudioPath? = null,
+    val amplitudePath: String? = null,
 )
 
 sealed interface Recordings {

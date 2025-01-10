@@ -3,6 +3,7 @@ package fyi.manpreet.flowdiary.ui.newrecord
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import arrow.core.raise.either
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.ic_excited
 import flowdiary.composeapp.generated.resources.ic_excited_outline
@@ -19,16 +20,17 @@ import flowdiary.composeapp.generated.resources.mood_neutral
 import flowdiary.composeapp.generated.resources.mood_peaceful
 import flowdiary.composeapp.generated.resources.mood_sad
 import flowdiary.composeapp.generated.resources.mood_stressed
+import fyi.manpreet.flowdiary.data.model.AmplitudeData
 import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.data.repository.AudioRepository
 import fyi.manpreet.flowdiary.platform.audioplayer.AudioPlayer
+import fyi.manpreet.flowdiary.platform.filemanager.FileManager
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.ui.components.emotion.Emotions
 import fyi.manpreet.flowdiary.ui.home.state.Topic
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordEvent
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordState
-import fyi.manpreet.flowdiary.util.Constants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -40,9 +42,11 @@ import kotlinx.coroutines.launch
 class NewRecordViewModel(
     private val repository: AudioRepository,
     private val audioPlayer: AudioPlayer,
+    private val fileManager: FileManager,
 ) : ViewModel() {
 
     private val _recordingPath = MutableStateFlow<AudioPath?>(null)
+    private val _amplitudePath = MutableStateFlow<String?>(null)
 
     private val _newRecordState = MutableStateFlow<NewRecordState?>(NewRecordState())
     val newRecordState: StateFlow<NewRecordState?> = _newRecordState
@@ -55,8 +59,9 @@ class NewRecordViewModel(
 
     private lateinit var navController: NavController
 
-    fun savePath(path: AudioPath, navController: NavController) {
+    fun savePath(path: AudioPath, amplitudePath: String, navController: NavController) {
         _recordingPath.update { path }
+        _amplitudePath.update { amplitudePath }
         this.navController = navController
     }
 
@@ -195,21 +200,27 @@ class NewRecordViewModel(
         viewModelScope.launch {
             val data = _newRecordState.value
             requireNotNull(data) { "Data is null" }
+
             val title = data.title
             val emotionType = data.emotionType
             val path = _recordingPath.value
+            val amplitudePath = _amplitudePath.value
             requireNotNull(title) { "Title is null" }
             requireNotNull(emotionType) { "EmotionType is null" }
             requireNotNull(path) { "Path is null" }
+            requireNotNull(amplitudePath) { "amplitudePath is null" }
+            val amplitudeData = getAmplitudeData(amplitudePath)
             val audio = Audio(
                 id = Audio.INVALID_ID,
                 path = path,
+                amplitudePath = amplitudePath,
                 createdDateInMillis = 0L,
                 title = title,
                 emotionType = emotionType,
                 topics = data.selectedTopics.toList(),
                 description = data.description,
-                duration = audioPlayer.getAudioDuration(path.value)
+                duration = audioPlayer.getAudioDuration(path.value),
+                amplitudeData = amplitudeData
             )
             repository.insertRecording(audio)
             onNavigateBack()
@@ -222,5 +233,16 @@ class NewRecordViewModel(
 
     private fun onNavigateBack() {
         navController.popBackStack()
+    }
+
+    private suspend fun getAmplitudeData(path: String): List<AmplitudeData> {
+        return either {
+            with(fileManager) {
+                this@either.getAmplitudeData(path)
+            }
+        }.fold(
+            ifLeft = { println("Failed to get recording path: $it"); emptyList() },
+            ifRight = { return it }
+        )
     }
 }

@@ -127,7 +127,7 @@ class HomeViewModel(
                 state.copy(
                     recordings = allRecordings.toRecordingList(),
                     moodChip = moodChip,
-                    topicsChip = topicChip
+                    topicsChip = topicChip,
                 )
             }
         }
@@ -219,9 +219,9 @@ class HomeViewModel(
     private fun onAudioRecordDone() {
         viewModelScope.launch {
             _recordingState.update { HomeEvent.AudioRecorder.Done }
-            val filePath = audioRecorder.stopRecording()
+            val (filePath, amplitudePath) = audioRecorder.stopRecording()
             Logger.i { "Audio recording done: $filePath" }
-            _homeState.update { it.copy(recordingPath = AudioPath(filePath)) }
+            _homeState.update { it.copy(recordingPath = AudioPath(filePath), amplitudePath = amplitudePath) }
         }
     }
 
@@ -261,8 +261,8 @@ class HomeViewModel(
             while (isActive) {
                 if (_playbackState.value.playingId == id && !_playbackState.value.isSeeking) {
                     val currentPosition = audioPlayer.getCurrentPosition()
-                    Logger.i { "Current : $currentPosition, $id" }
-                    _playbackState.update { it.copy(position = audioPlayer.getCurrentPosition()) }
+                    Logger.i { "VM Position : $currentPosition, $id" }
+                    _playbackState.update { it.copy(position = currentPosition) }
                 }
                 delay(100) // Update every 100ms
             }

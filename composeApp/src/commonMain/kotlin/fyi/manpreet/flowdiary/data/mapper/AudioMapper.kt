@@ -24,11 +24,13 @@ fun Audio.toAudioData(): AudioTable.AudioData {
             if (createdDateInMillis == Audio.INVALID_ID) Clock.System.now().toEpochMilliseconds()
             else createdDateInMillis,
         path = path.value.substringAfterLast("/"),
+        amplitudePath = amplitudePath.substringAfterLast("/"),
         title = title,
         topics = topics.toTopicsString(),
         description = description,
         emotionType = emotionType.toEmotionType(),
         duration = duration,
+        amplitudeData = amplitudeData,
     )
 }
 
@@ -41,12 +43,14 @@ fun AudioTable.AudioData.toAudio(): Audio {
     return Audio(
         id = id,
         path = AudioPath(path),
+        amplitudePath = amplitudePath,
         createdDateInMillis = createdDateInMillis,
         title = title,
         topics = topics.toTopics(),
         description = description,
         emotionType = emotionType,
         duration = duration,
+        amplitudeData = amplitudeData,
     )
 }
 

@@ -52,12 +52,13 @@ fun NewRecordScreen(
     viewModel: NewRecordViewModel = koinViewModel(),
     navController: NavController,
     path: AudioPath,
+    amplitudePath: String,
 ) {
 
     val newRecordState = viewModel.newRecordState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.savePath(path, navController)
+        viewModel.savePath(path, amplitudePath, navController)
     }
 
     NewRecordScreenContent(
