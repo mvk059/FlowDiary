@@ -40,7 +40,7 @@
     <string name="settings_my_mood_subtitle">Select default mood to apply to all new entries</string>
     <string name="settings_my_topics">My Topics</string>
     <string name="settings_my_topics_subtitle">Select default topics to apply to all new entries</string>
-    <string name="settings_create_new_topic">Create %1$s</string>
+    <string name="settings_create_new_topic">Create ‘%1$s’</string>
 
     <string name="permission_denied_title">Permission Denied</string>
     <string name="permission_denied_message">You cannot record audio journals unless you provide this permission</string>
