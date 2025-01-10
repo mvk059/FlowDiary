@@ -2,7 +2,7 @@ package fyi.manpreet.flowdiary.platform.audiorecord
 
 expect class AudioRecorder {
     suspend fun startRecording(fileName: String)
-    suspend fun stopRecording(): String  // Returns the file path
+    suspend fun stopRecording(): Pair<String, String>
     suspend fun pauseRecording()
     suspend fun resumeRecording()
     suspend fun discardRecording()
