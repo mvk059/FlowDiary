@@ -52,10 +52,7 @@ fun App(
             }
 
             composable<SettingsDestination> {
-                SettingsScreen(
-                    navController = navController,
-                    onBackClick = { navController.navigateUp() }
-                )
+                SettingsScreen(onBackClick = { navController.navigateUp() })
             }
         }
     }

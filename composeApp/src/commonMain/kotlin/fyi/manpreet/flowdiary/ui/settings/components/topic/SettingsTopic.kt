@@ -28,10 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -41,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.hashtag_cd
@@ -51,6 +49,7 @@ import flowdiary.composeapp.generated.resources.settings_create_new_topic
 import flowdiary.composeapp.generated.resources.settings_my_topics
 import flowdiary.composeapp.generated.resources.settings_my_topics_subtitle
 import fyi.manpreet.flowdiary.ui.home.state.Topic
+import fyi.manpreet.flowdiary.ui.settings.state.SettingsEvent
 import fyi.manpreet.flowdiary.ui.theme.Secondary95
 import fyi.manpreet.flowdiary.ui.theme.spacing
 import org.jetbrains.compose.resources.painterResource
@@ -59,25 +58,28 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun TopicsSelection(
     modifier: Modifier = Modifier,
+    selectedTopics: Set<Topic>,
+    onSelectedTopicAdd: (SettingsEvent.Topics) -> Unit,
+    onSelectedTopicRemove: (SettingsEvent.Topics) -> Unit,
+    savedTopics: Set<Topic>,
+    onSavedTopicsAdd: (SettingsEvent.Topics) -> Unit,
+    isAddingTopic: Boolean,
+    onAddingTopicChange: (SettingsEvent.Topics) -> Unit,
+    searchQuery: String,
+    onSearchQueryChange: (SettingsEvent.Topics) -> Unit,
 ) {
-    // Track both selected topics and all saved topics
-    var selectedTopics by remember { mutableStateOf(setOf<Topic>()) }
-    var savedTopics by remember { mutableStateOf(setOf(Topic("Work"), Topic("Love"), Topic("Jack"), Topic("Jared"))) }
-    var isAddingTopic by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
+
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
 
     TopicsList(
         modifier = modifier,
         selectedTopics = selectedTopics,
-        onSelectedTopics = { selectedTopics = it },
+        onSelectedTopicRemove = { onSelectedTopicRemove(SettingsEvent.Topics.SelectedTopicRemove(it)) },
         isAddingTopic = isAddingTopic,
-        onAddingTopicChange = { isAddingTopic = it },
+        onAddingTopicChange = { onAddingTopicChange(SettingsEvent.Topics.IsAddingStatusChange(it)) },
         searchQuery = searchQuery,
-        onSearchQueryChange = { searchQuery = it },
-        savedTopics = savedTopics,
-        onSavedTopicsChange = { savedTopics = it },
+        onSearchQueryChange = { onSearchQueryChange(SettingsEvent.Topics.SearchQueryChanged(it)) },
         focusRequester = focusRequester,
         keyboardController = keyboardController,
     )
@@ -87,13 +89,12 @@ fun TopicsSelection(
     TopicDropdown(
         modifier = modifier,
         selectedTopics = selectedTopics,
-        onSelectedTopicsChange = { selectedTopics = it },
-        isAddingTopic = isAddingTopic,
-        onAddingTopicChange = { isAddingTopic = it },
+        onSelectedTopicAdd = { onSelectedTopicAdd(SettingsEvent.Topics.SelectedTopicAdd(it)) },
+        onAddingTopicChange = { onAddingTopicChange(SettingsEvent.Topics.IsAddingStatusChange(it)) },
         searchQuery = searchQuery,
-        onSearchQueryChange = { searchQuery = it },
+        onSearchQueryChange = { onSearchQueryChange(SettingsEvent.Topics.SearchQueryChanged(it)) },
         savedTopics = savedTopics,
-        onSavedTopicsChange = { savedTopics = it },
+        onSavedTopicsAdd = { onSavedTopicsAdd(SettingsEvent.Topics.SavedTopicsAdd(it)) },
     )
 }
 
@@ -101,13 +102,11 @@ fun TopicsSelection(
 private fun TopicsList(
     modifier: Modifier = Modifier,
     selectedTopics: Set<Topic>,
-    onSelectedTopics: (Set<Topic>) -> Unit,
+    onSelectedTopicRemove: (Topic) -> Unit,
     isAddingTopic: Boolean,
     onAddingTopicChange: (Boolean) -> Unit,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    savedTopics: Set<Topic>,
-    onSavedTopicsChange: (Set<Topic>) -> Unit,
     focusRequester: FocusRequester,
     keyboardController: SoftwareKeyboardController?,
 ) {
@@ -130,13 +129,11 @@ private fun TopicsList(
 
             ChipFlowRow(
                 selectedTopics = selectedTopics,
-                onSelectedTopics = onSelectedTopics,
+                onSelectedTopicRemove = onSelectedTopicRemove,
                 isAddingTopic = isAddingTopic,
                 onAddingTopicChange = onAddingTopicChange,
                 searchQuery = searchQuery,
                 onSearchQueryChange = onSearchQueryChange,
-                savedTopics = savedTopics,
-                onSavedTopicsChange = onSavedTopicsChange,
                 focusRequester = focusRequester,
                 keyboardController = keyboardController,
             )
@@ -165,13 +162,11 @@ private fun TitleText() {
 @Composable
 private fun ChipFlowRow(
     selectedTopics: Set<Topic>,
-    onSelectedTopics: (Set<Topic>) -> Unit,
+    onSelectedTopicRemove: (Topic) -> Unit,
     isAddingTopic: Boolean,
     onAddingTopicChange: (Boolean) -> Unit,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    savedTopics: Set<Topic>,
-    onSavedTopicsChange: (Set<Topic>) -> Unit,
     focusRequester: FocusRequester,
     keyboardController: SoftwareKeyboardController?,
 ) {
@@ -197,7 +192,7 @@ private fun ChipFlowRow(
                 ),
                 topic = topic.value,
                 shouldShowCancel = true,
-                onCancel = { onSelectedTopics(selectedTopics - topic) }
+                onCancel = { onSelectedTopicRemove(topic) }
             )
         }
 
@@ -228,6 +223,7 @@ private fun ChipFlowRow(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done,
+                    capitalization = KeyboardCapitalization.Sentences,
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
@@ -244,13 +240,12 @@ private fun ChipFlowRow(
 fun TopicDropdown(
     modifier: Modifier = Modifier,
     selectedTopics: Set<Topic>,
-    onSelectedTopicsChange: (Set<Topic>) -> Unit,
-    isAddingTopic: Boolean,
+    onSelectedTopicAdd: (Topic) -> Unit,
     onAddingTopicChange: (Boolean) -> Unit,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     savedTopics: Set<Topic>,
-    onSavedTopicsChange: (Set<Topic>) -> Unit = {},
+    onSavedTopicsAdd: (Topic) -> Unit,
 ) {
 
     Box(
@@ -270,8 +265,7 @@ fun TopicDropdown(
 
             // Filter saved topics based on search query
             val matchingSavedTopics = savedTopics.filter {
-                it.value.startsWith(prefix = searchQuery, ignoreCase = true)
-                        && !selectedTopics.contains(it)
+                it.value.startsWith(prefix = searchQuery, ignoreCase = true) && !selectedTopics.contains(it)
             }
 
             // Show matching saved topics first
@@ -281,7 +275,7 @@ fun TopicDropdown(
                         .fillMaxWidth()
                         .clickable(
                             onClick = {
-                                onSelectedTopicsChange(selectedTopics + topic)
+                                onSelectedTopicAdd(topic)
                                 onSearchQueryChange("")
                                 onAddingTopicChange(false)
                             }
@@ -311,8 +305,8 @@ fun TopicDropdown(
                         .fillMaxWidth()
                         .clickable {
                             val newTopic = Topic(searchQuery.trim())
-                            onSavedTopicsChange(savedTopics + newTopic)
-                            onSelectedTopicsChange(selectedTopics + newTopic)
+                            onSavedTopicsAdd(newTopic)
+                            onSelectedTopicAdd(newTopic)
                             onSearchQueryChange("")
                             onAddingTopicChange(false)
                         }
