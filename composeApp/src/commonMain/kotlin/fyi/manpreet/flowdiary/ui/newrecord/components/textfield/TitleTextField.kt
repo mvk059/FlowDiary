@@ -22,6 +22,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.new_record_add_icon_cd
@@ -42,12 +43,13 @@ fun TitleTextField(
     emotionType: EmotionType?,
     onAddClick: (NewRecordEvent.FabBottomSheet) -> Unit,
     onTitleUpdate: (NewRecordEvent.Data) -> Unit,
+    isEmotionSelected: Boolean?,
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(isEmotionSelected) {
         focusRequester.requestFocus()
         keyboardController?.show()
     }
@@ -106,6 +108,7 @@ fun TitleTextField(
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Next,
+            capitalization = KeyboardCapitalization.Sentences,
         ),
     )
 }

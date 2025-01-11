@@ -11,7 +11,7 @@ data class NewRecordState(
     val emotionType: EmotionType? = null,
     val emotions: List<Emotions> = emptyList(),
     val selectedTopics: Set<Topic> = emptySet(),
-    val savedTopics: Set<Topic> = setOf(Topic("Work"), Topic("Love"), Topic("Jack"), Topic("Jared")), //emptySet(),
+    val savedTopics: Set<Topic> = emptySet(),
     val isAddingTopic: Boolean = false,
     val searchQuery: String = "",
     val description: String = "",

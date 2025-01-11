@@ -84,42 +84,57 @@ class NewRecordViewModel(
     }
 
     private fun initRecordState() {
-        val emotions = listOf(
-            Emotions(
-                type = EmotionType.Excited,
-                selectedIcon = Res.drawable.ic_excited,
-                unselectedIcon = Res.drawable.ic_excited_outline,
-                contentDescription = Res.string.mood_excited,
-            ),
-            Emotions(
-                type = EmotionType.Peaceful,
-                selectedIcon = Res.drawable.ic_peaceful,
-                unselectedIcon = Res.drawable.ic_peaceful_outline,
-                contentDescription = Res.string.mood_peaceful,
-            ),
-            Emotions(
-                type = EmotionType.Neutral,
-                selectedIcon = Res.drawable.ic_neutral,
-                unselectedIcon = Res.drawable.ic_neutal_outline,
-                contentDescription = Res.string.mood_neutral,
-            ),
-            Emotions(
-                type = EmotionType.Sad,
-                selectedIcon = Res.drawable.ic_sad,
-                unselectedIcon = Res.drawable.ic_sad_outline,
-                contentDescription = Res.string.mood_sad,
-            ),
-            Emotions(
-                type = EmotionType.Stressed,
-                selectedIcon = Res.drawable.ic_stressed,
-                unselectedIcon = Res.drawable.ic_stressed_outline,
-                contentDescription = Res.string.mood_stressed,
-            ),
-        )
-        _newRecordState.update {
-            NewRecordState(
-                emotions = emotions,
+        viewModelScope.launch {
+            val defaultEmotion = repository.getDefaultEmotion()
+            val selectedTopics = repository.getAllSelectedTopics()
+            val savedTopics = repository.getAllSavedTopics()
+            val emotions = listOf(
+                Emotions(
+                    type = EmotionType.Excited,
+                    selectedIcon = Res.drawable.ic_excited,
+                    unselectedIcon = Res.drawable.ic_excited_outline,
+                    contentDescription = Res.string.mood_excited,
+                    isSelected = EmotionType.Excited == defaultEmotion,
+                ),
+                Emotions(
+                    type = EmotionType.Peaceful,
+                    selectedIcon = Res.drawable.ic_peaceful,
+                    unselectedIcon = Res.drawable.ic_peaceful_outline,
+                    contentDescription = Res.string.mood_peaceful,
+                    isSelected = EmotionType.Peaceful == defaultEmotion,
+                ),
+                Emotions(
+                    type = EmotionType.Neutral,
+                    selectedIcon = Res.drawable.ic_neutral,
+                    unselectedIcon = Res.drawable.ic_neutal_outline,
+                    contentDescription = Res.string.mood_neutral,
+                    isSelected = EmotionType.Neutral == defaultEmotion,
+                ),
+                Emotions(
+                    type = EmotionType.Sad,
+                    selectedIcon = Res.drawable.ic_sad,
+                    unselectedIcon = Res.drawable.ic_sad_outline,
+                    contentDescription = Res.string.mood_sad,
+                    isSelected = EmotionType.Sad == defaultEmotion,
+                ),
+                Emotions(
+                    type = EmotionType.Stressed,
+                    selectedIcon = Res.drawable.ic_stressed,
+                    unselectedIcon = Res.drawable.ic_stressed_outline,
+                    contentDescription = Res.string.mood_stressed,
+                    isSelected = EmotionType.Stressed == defaultEmotion,
+                ),
             )
+            _newRecordState.update {
+                NewRecordState(
+                    emotions = emotions,
+                    emotionType = defaultEmotion,
+                    selectedTopics = selectedTopics,
+                    savedTopics = savedTopics,
+                    fabState = NewRecordEvent.FabBottomSheet.SheetShow,
+                    isEmotionSaveButtonEnabled = defaultEmotion != null,
+                )
+            }
         }
     }
 
@@ -210,6 +225,11 @@ class NewRecordViewModel(
             requireNotNull(path) { "Path is null" }
             requireNotNull(amplitudePath) { "amplitudePath is null" }
             val amplitudeData = getAmplitudeData(amplitudePath)
+
+            _newRecordState.value?.selectedTopics?.forEach {
+                repository.insertSavedTopic(it)
+            }
+
             val audio = Audio(
                 id = Audio.INVALID_ID,
                 path = path,

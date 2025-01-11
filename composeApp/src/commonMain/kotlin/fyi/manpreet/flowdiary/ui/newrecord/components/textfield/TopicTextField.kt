@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import fyi.manpreet.flowdiary.ui.home.state.Topic
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordEvent
@@ -75,13 +76,12 @@ fun TopicTextField(
     TopicDropdown(
         modifier = modifier,
         selectedTopics = selectedTopics,
-        onSelectedTopicsChange = { onAddingTopicChange(NewRecordEvent.Data.Topics.SelectedTopicsChange(it)) },
-        isAddingTopic = isAddingTopic,
+        onSelectedTopicAdd = { onAddingTopicChange(NewRecordEvent.Data.Topics.SelectedTopicsChange(selectedTopics + it)) },
         onAddingTopicChange = { onAddingTopicChange(NewRecordEvent.Data.Topics.IsAddingStatusChange(it)) },
         searchQuery = searchQuery,
         onSearchQueryChange = { onSearchQueryChange(NewRecordEvent.Data.Topics.SearchQueryChanged(it)) },
         savedTopics = savedTopics,
-        onSavedTopicsChange = { onSavedTopicsChange(NewRecordEvent.Data.Topics.SavedTopicsChange(it)) },
+        onSavedTopicsAdd = { onSavedTopicsChange(NewRecordEvent.Data.Topics.SavedTopicsChange(savedTopics + it)) },
     )
 }
 
@@ -176,6 +176,7 @@ private fun ChipFlowRow(
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = imeAction,
+                capitalization = KeyboardCapitalization.Sentences,
             ),
             keyboardActions = KeyboardActions(
                 onDone = {

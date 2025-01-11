@@ -122,6 +122,7 @@ fun NewRecordScreenContent(
                 emotionType = newRecordState.value?.emotionType,
                 onAddClick = onBottomSheetShow,
                 onTitleUpdate = onTitleUpdate,
+                isEmotionSelected = newRecordState.value?.isEmotionSaveButtonEnabled
             )
 
             TopicTextField(
@@ -205,6 +206,7 @@ fun NewRecordScreenContent(
 
         EmotionBottomSheet(
             fabBottomSheet = newRecordState.value?.fabState,
+            emotionType = newRecordState.value?.emotionType,
             emotions = newRecordState.value?.emotions,
             emotionsSaveButtonEnabled = newRecordState.value?.isEmotionSaveButtonEnabled ?: false,
             onEmotionTypeSelect = onEmotionTypeSelect,

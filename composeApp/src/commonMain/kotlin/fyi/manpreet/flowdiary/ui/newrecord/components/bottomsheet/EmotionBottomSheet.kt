@@ -47,19 +47,20 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun EmotionBottomSheet(
     modifier: Modifier = Modifier,
-    fabBottomSheet: NewRecordEvent.FabBottomSheet?,
+    emotionType: EmotionType?,
     emotions: List<Emotions>?,
     emotionsSaveButtonEnabled: Boolean,
+    fabBottomSheet: NewRecordEvent.FabBottomSheet?,
     onEmotionTypeSelect: (NewRecordEvent.Data) -> Unit,
     onDismiss: (NewRecordEvent.FabBottomSheet) -> Unit,
 ) {
 
     if (emotions.isNullOrEmpty()) return
-    var selectedIcon by remember { mutableStateOf<EmotionType?>(null) }
+    var selectedIcon by remember { mutableStateOf(emotionType) }
 
     val sheetState = rememberModalBottomSheetState(
-        initialDetent = Hidden,
-        detents = listOf(Hidden, Peek)
+        initialDetent = if (fabBottomSheet == NewRecordEvent.FabBottomSheet.SheetHide) Hidden else Peek,
+        detents = listOf(Hidden, Peek),
     )
 
     if (fabBottomSheet == NewRecordEvent.FabBottomSheet.SheetShow) sheetState.currentDetent = Peek
