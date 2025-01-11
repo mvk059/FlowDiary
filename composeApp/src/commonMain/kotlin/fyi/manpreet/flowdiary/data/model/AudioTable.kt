@@ -1,11 +1,15 @@
 package fyi.manpreet.flowdiary.data.model
 
+import fyi.manpreet.flowdiary.ui.home.state.Topic
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 
 @Serializable
 data class AudioTable(
     val recordings: List<AudioData> = emptyList(),
+    val defaultTopics: Set<Topic> = emptySet(),
+    val savedTopics: Set<Topic> = emptySet(),
+    val defaultEmotionType: String? = null,
 ) {
 
     @Serializable
