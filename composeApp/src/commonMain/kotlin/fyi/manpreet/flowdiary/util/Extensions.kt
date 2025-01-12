@@ -19,14 +19,19 @@ import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.ui.home.state.Recordings
 import fyi.manpreet.flowdiary.ui.theme.Excited35
+import fyi.manpreet.flowdiary.ui.theme.Excited80
 import fyi.manpreet.flowdiary.ui.theme.Excited95
 import fyi.manpreet.flowdiary.ui.theme.Neutral35
+import fyi.manpreet.flowdiary.ui.theme.Neutral80
 import fyi.manpreet.flowdiary.ui.theme.Neutral95
 import fyi.manpreet.flowdiary.ui.theme.Peaceful35
+import fyi.manpreet.flowdiary.ui.theme.Peaceful80
 import fyi.manpreet.flowdiary.ui.theme.Peaceful95
 import fyi.manpreet.flowdiary.ui.theme.Sad35
+import fyi.manpreet.flowdiary.ui.theme.Sad80
 import fyi.manpreet.flowdiary.ui.theme.Sad95
 import fyi.manpreet.flowdiary.ui.theme.Stressed35
+import fyi.manpreet.flowdiary.ui.theme.Stressed80
 import fyi.manpreet.flowdiary.ui.theme.Stressed95
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -98,6 +103,16 @@ fun EmotionType.getBackgroundColor(): Color {
         EmotionType.Neutral -> Neutral95
         EmotionType.Sad -> Sad95
         EmotionType.Stressed -> Stressed95
+    }
+}
+
+fun EmotionType.getPlaybackBackgroundColor(): Color {
+    return when (this) {
+        EmotionType.Excited -> Excited80
+        EmotionType.Peaceful -> Peaceful80
+        EmotionType.Neutral -> Neutral80
+        EmotionType.Sad -> Sad80
+        EmotionType.Stressed -> Stressed80
     }
 }
 
