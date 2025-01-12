@@ -33,8 +33,12 @@ import fyi.manpreet.flowdiary.ui.theme.Sad95
 import fyi.manpreet.flowdiary.ui.theme.Stressed35
 import fyi.manpreet.flowdiary.ui.theme.Stressed80
 import fyi.manpreet.flowdiary.ui.theme.Stressed95
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.DrawableResource
 import kotlin.time.Duration
@@ -57,23 +61,6 @@ fun Modifier.noRippleClickable(
     }
 }
 
-fun List<Audio>.toRecordingList(): List<Recordings> {
-    return this
-        .groupBy { audio ->
-            Instant.fromEpochMilliseconds(audio.createdDateInMillis)
-                .toLocalDateTime(TimeZone.currentSystemDefault())
-                .date.toString()
-        }
-        .entries
-        .sortedByDescending { it.key }
-        .flatMap { (date, audioList) ->
-            listOf(
-                Recordings.Date(date),
-                Recordings.Entry(audioList)
-            )
-        }
-}
-
 fun Duration.formatDuration(): String {
     val seconds = (inWholeSeconds % 60).toString().padStart(2, '0')
     val minutes = (inWholeMinutes % 60).toString().padStart(2, '0')
@@ -83,6 +70,40 @@ fun Duration.formatDuration(): String {
     return when {
         wholeHours > 0 -> "$hours:$minutes:$seconds"
         else -> "$minutes:$seconds"
+    }
+}
+
+fun List<Audio>.toRecordingList(): List<Recordings> {
+    return this
+        .groupBy { audio ->
+            // Group by date only (not exact timestamp)
+            Instant.fromEpochMilliseconds(audio.createdDateInMillis)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .date
+        }
+        .entries
+        .sortedByDescending { it.key }
+        .flatMap { (date, audioList) ->
+            listOf(
+                Recordings.Date(formatRelativeDate(date)), // Format the date for display
+                Recordings.Entry(audioList.sortedByDescending { it.createdDateInMillis }) // Sort entries within each day
+            )
+        }
+}
+
+fun formatRelativeDate(date: LocalDate): String {
+    val today = Clock.System.now()
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+        .date
+
+    val yesterday = today.minus(DatePeriod(days = 1))
+
+    return when (date) {
+        today -> "Today"
+        yesterday -> "Yesterday"
+        else -> "${date.dayOfWeek.toString().lowercase().capitalize()}, ${
+            date.month.toString().take(3)
+        } ${date.dayOfMonth}"
     }
 }
 
