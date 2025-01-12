@@ -17,8 +17,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -116,6 +118,8 @@ fun NewRecordScreenContent(
             verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small),
         ) {
 
+            val descriptionFieldFocusRequester: FocusRequester = remember { FocusRequester() }
+
             TitleTextField(
                 modifier = Modifier.padding(horizontal = MaterialTheme.spacing.medium),
                 title = newRecordState.value?.title,
@@ -137,6 +141,7 @@ fun NewRecordScreenContent(
                 searchQuery = newRecordState.value?.searchQuery ?: "",
                 onSearchQueryChange = onSearchQueryChange,
                 hintText = Res.string.new_record_add_topic,
+                descriptionFieldFocusRequester = descriptionFieldFocusRequester,
             )
 
             DescriptionTextField(
@@ -146,6 +151,7 @@ fun NewRecordScreenContent(
                 icon = Res.drawable.ic_edit,
                 hintText = Res.string.new_record_add_description,
                 imeAction = ImeAction.Done,
+                descriptionFieldFocusRequester = descriptionFieldFocusRequester,
             )
 
             Spacer(modifier = Modifier.weight(1f))

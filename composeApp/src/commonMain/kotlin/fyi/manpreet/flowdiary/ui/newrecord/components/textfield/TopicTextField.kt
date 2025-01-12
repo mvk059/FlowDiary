@@ -18,14 +18,10 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,24 +47,23 @@ fun TopicTextField(
     searchQuery: String,
     onSearchQueryChange: (NewRecordEvent.Data.Topics) -> Unit,
     hintText: StringResource,
-    imeAction: ImeAction = ImeAction.Next,
+    descriptionFieldFocusRequester: FocusRequester,
 ) {
 
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val focusRequester = remember { FocusRequester() }
+//    val focusRequester = remember { FocusRequester() }
 
     TopicsList(
         modifier = modifier,
         icon = icon,
         hintText = hintText,
-        imeAction = imeAction,
         selectedTopics = selectedTopics,
-        onSelectedTopics = onSelectedTopicChange,
+        onSelectedTopicChange = onSelectedTopicChange,
+        savedTopics = savedTopics,
+        onSavedTopicsChange = onSavedTopicsChange,
         onAddingTopicChange = onAddingTopicChange,
         searchQuery = searchQuery,
         onSearchQueryChange = onSearchQueryChange,
-        focusRequester = focusRequester,
-        keyboardController = keyboardController,
+        descriptionFieldFocusRequester = descriptionFieldFocusRequester,
     )
 
     if (searchQuery.isEmpty()) return
@@ -76,12 +71,30 @@ fun TopicTextField(
     TopicDropdown(
         modifier = modifier,
         selectedTopics = selectedTopics,
-        onSelectedTopicAdd = { onAddingTopicChange(NewRecordEvent.Data.Topics.SelectedTopicsChange(selectedTopics + it)) },
-        onAddingTopicChange = { onAddingTopicChange(NewRecordEvent.Data.Topics.IsAddingStatusChange(it)) },
+        onSelectedTopicAdd = {
+            onAddingTopicChange(
+                NewRecordEvent.Data.Topics.SelectedTopicsChange(
+                    selectedTopics + it
+                )
+            )
+        },
+        onAddingTopicChange = {
+            onAddingTopicChange(
+                NewRecordEvent.Data.Topics.IsAddingStatusChange(
+                    it
+                )
+            )
+        },
         searchQuery = searchQuery,
         onSearchQueryChange = { onSearchQueryChange(NewRecordEvent.Data.Topics.SearchQueryChanged(it)) },
         savedTopics = savedTopics,
-        onSavedTopicsAdd = { onSavedTopicsChange(NewRecordEvent.Data.Topics.SavedTopicsChange(savedTopics + it)) },
+        onSavedTopicsAdd = {
+            onSavedTopicsChange(
+                NewRecordEvent.Data.Topics.SavedTopicsChange(
+                    savedTopics + it
+                )
+            )
+        },
     )
 }
 
@@ -90,14 +103,14 @@ private fun TopicsList(
     modifier: Modifier = Modifier,
     icon: DrawableResource,
     hintText: StringResource,
-    imeAction: ImeAction,
     selectedTopics: Set<Topic>,
-    onSelectedTopics: (NewRecordEvent.Data.Topics) -> Unit,
+    onSelectedTopicChange: (NewRecordEvent.Data.Topics) -> Unit,
+    savedTopics: Set<Topic>,
+    onSavedTopicsChange: (NewRecordEvent.Data.Topics) -> Unit,
     onAddingTopicChange: (NewRecordEvent.Data.Topics) -> Unit,
     searchQuery: String,
     onSearchQueryChange: (NewRecordEvent.Data.Topics) -> Unit,
-    focusRequester: FocusRequester,
-    keyboardController: SoftwareKeyboardController?,
+    descriptionFieldFocusRequester: FocusRequester,
 ) {
 
     Row(
@@ -115,14 +128,14 @@ private fun TopicsList(
 
         ChipFlowRow(
             hintText = hintText,
-            imeAction = imeAction,
             selectedTopics = selectedTopics,
-            onSelectedTopics = onSelectedTopics,
+            onSelectedTopicChange = onSelectedTopicChange,
+            savedTopics = savedTopics,
+            onSavedTopicsChange = onSavedTopicsChange,
             onAddingTopicChange = onAddingTopicChange,
             searchQuery = searchQuery,
             onSearchQueryChange = onSearchQueryChange,
-            focusRequester = focusRequester,
-            keyboardController = keyboardController,
+            descriptionFieldFocusRequester = descriptionFieldFocusRequester,
         )
     }
 }
@@ -131,14 +144,14 @@ private fun TopicsList(
 @Composable
 private fun ChipFlowRow(
     hintText: StringResource,
-    imeAction: ImeAction,
     selectedTopics: Set<Topic>,
-    onSelectedTopics: (NewRecordEvent.Data.Topics) -> Unit,
+    onSelectedTopicChange: (NewRecordEvent.Data.Topics) -> Unit,
+    savedTopics: Set<Topic>,
+    onSavedTopicsChange: (NewRecordEvent.Data.Topics) -> Unit,
     onAddingTopicChange: (NewRecordEvent.Data.Topics) -> Unit,
     searchQuery: String,
     onSearchQueryChange: (NewRecordEvent.Data.Topics) -> Unit,
-    focusRequester: FocusRequester,
-    keyboardController: SoftwareKeyboardController?,
+    descriptionFieldFocusRequester: FocusRequester,
 ) {
 
     // Selected Topics
@@ -155,7 +168,11 @@ private fun ChipFlowRow(
                 topic = topic.value,
                 shouldShowCancel = true,
                 onCancel = {
-                    onSelectedTopics(NewRecordEvent.Data.Topics.SelectedTopicsChange(selectedTopics - topic))
+                    onSelectedTopicChange(
+                        NewRecordEvent.Data.Topics.SelectedTopicsChange(
+                            selectedTopics - topic
+                        )
+                    )
                 }
             )
         }
@@ -170,18 +187,26 @@ private fun ChipFlowRow(
                 .then(
                     if (selectedTopics.isNotEmpty()) Modifier.padding(top = MaterialTheme.spacing.small)
                     else Modifier
-                )
-                .focusRequester(focusRequester),
+                ),
             singleLine = true,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
-                imeAction = imeAction,
+                imeAction = ImeAction.Next,
                 capitalization = KeyboardCapitalization.Sentences,
             ),
             keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboardController?.hide()
+                onNext = {
+                    val newTopic = Topic(searchQuery.trim())
+                    if (newTopic.value.isEmpty()) {
+                        descriptionFieldFocusRequester.requestFocus()
+                        return@KeyboardActions
+                    }
+
                     onAddingTopicChange(NewRecordEvent.Data.Topics.IsAddingStatusChange(false))
+                    onSelectedTopicChange(NewRecordEvent.Data.Topics.SelectedTopicsChange(selectedTopics + newTopic))
+                    onSavedTopicsChange(NewRecordEvent.Data.Topics.SavedTopicsChange(savedTopics + newTopic))
+                    onSearchQueryChange(NewRecordEvent.Data.Topics.SearchQueryChanged(""))
+
                 }
             ),
             decorationBox = { innerTextField ->

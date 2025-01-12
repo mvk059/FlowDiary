@@ -12,7 +12,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -20,6 +19,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordEvent
 import fyi.manpreet.flowdiary.ui.theme.spacing
@@ -36,10 +36,10 @@ fun DescriptionTextField(
     icon: DrawableResource,
     hintText: StringResource,
     imeAction: ImeAction = ImeAction.Done,
+    descriptionFieldFocusRequester: FocusRequester,
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
-    val focusRequester = remember { FocusRequester() }
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -57,18 +57,22 @@ fun DescriptionTextField(
             value = descriptionText,
             onValueChange = { onDescriptionUpdate(NewRecordEvent.Data.UpdateDescription(it)) },
             modifier = Modifier
-                .padding(start = MaterialTheme.spacing.small, top = MaterialTheme.spacing.extraSmall)
-                .focusRequester(focusRequester),
+                .padding(
+                    start = MaterialTheme.spacing.small,
+                    top = MaterialTheme.spacing.extraSmall
+                )
+                .focusRequester(descriptionFieldFocusRequester),
             textStyle = MaterialTheme.typography.bodyMedium,
             maxLines = 10,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = imeAction,
+                capitalization = KeyboardCapitalization.Sentences,
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
                     keyboardController?.hide()
-                    focusRequester.freeFocus()
+                    descriptionFieldFocusRequester.freeFocus()
                 }
             ),
             decorationBox = { innerTextField ->
