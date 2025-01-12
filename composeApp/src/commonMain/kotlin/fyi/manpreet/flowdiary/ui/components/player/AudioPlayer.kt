@@ -99,9 +99,10 @@ fun AudioPlayer(
                 backgroundColor = emotionType.getPlaybackBackgroundColor()
             )
 
-            // TODO Fix spacing
             Row(
-                modifier = Modifier.widthIn(min = MaterialTheme.spacing.medium),
+                modifier = Modifier
+                    .widthIn(min = MaterialTheme.spacing.medium)
+                    .padding(end = MaterialTheme.spacing.extraSmall),
             ) {
                 Text(
                     text = formattedTime,
