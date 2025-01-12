@@ -1,6 +1,7 @@
 package fyi.manpreet.flowdiary.ui.home.components.chips
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,13 +34,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.boundsInWindow
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import flowdiary.composeapp.generated.resources.Res
@@ -52,6 +53,7 @@ fun ChipFilter(
     modifier: Modifier = Modifier,
     filterOption: FilterOption,
     selectedOptions: List<FilterOption.Options>,
+    shouldShowIcon: Boolean,
     onOptionSelected: (Int) -> Unit,
     onReset: () -> Unit,
 ) {
@@ -59,11 +61,8 @@ fun ChipFilter(
     var expanded by remember { mutableStateOf(false) }
     val chipBorderColor =
         if (selectedOptions.isNotEmpty()) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.outlineVariant
-    val backgroundColor = if (selectedOptions.isNotEmpty()) MaterialTheme.colorScheme.onPrimary else Color.Transparent
-
-    var chipSize by remember { mutableStateOf(Size.Zero) }
-    var chipOffset by remember { mutableStateOf(IntOffset.Zero) }
-
+    val backgroundColor =
+        if (selectedOptions.isNotEmpty()) MaterialTheme.colorScheme.onPrimary else Color.Transparent
 
     Box(modifier = modifier) {
 
@@ -80,18 +79,6 @@ fun ChipFilter(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.extraSmall),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .onGloballyPositioned { coordinates ->
-                            // Store the chip's size and position
-                            chipSize = Size(
-                                coordinates.size.width.toFloat(),
-                                coordinates.size.height.toFloat(),
-                            )
-                            chipOffset = IntOffset(
-                                coordinates.boundsInWindow().left.toInt(),
-                                coordinates.boundsInWindow().top.toInt()
-                            )
-                        },
                 ) {
                     val displayText = when {
                         selectedOptions.isEmpty() -> filterOption.title
@@ -101,12 +88,28 @@ fun ChipFilter(
                             "${sortedOptions[0].text}, ${sortedOptions[1].text} +${selectedOptions.size - 2}"
                         }
                     }
+
+                    if (shouldShowIcon) {
+                        Row(
+                            modifier = Modifier.wrapContentWidth(),
+                            horizontalArrangement = Arrangement.spacedBy((-4).dp) // Negative spacing pulls icons together
+                        ) {
+                            selectedOptions.fastForEach { option ->
+                                Image(
+                                    painter = painterResource(option.icon),
+                                    contentDescription = option.text,
+                                )
+                            }
+                        }
+                    }
+
                     Text(
                         text = displayText,
                         style = MaterialTheme.typography.labelSmall,
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.secondary,
                     )
+
                     if (selectedOptions.isNotEmpty()) {
                         IconButton(
                             onClick = onReset,
@@ -124,6 +127,13 @@ fun ChipFilter(
         )
 
         if (expanded) {
+            val density = LocalDensity.current
+            val verticalOffset = remember {
+                with(density) {
+                    (FilterChipDefaults.Height + 16.dp).toPx().toInt()
+                }
+            }
+
             Popup(
                 onDismissRequest = { expanded = false },
                 properties = PopupProperties(
@@ -131,7 +141,7 @@ fun ChipFilter(
                     dismissOnBackPress = true,
                     dismissOnClickOutside = true
                 ),
-                offset = IntOffset(0, chipSize.height.toInt() + 0)
+                offset = IntOffset(0, verticalOffset)
             ) {
                 Surface(
                     modifier = Modifier
@@ -149,9 +159,12 @@ fun ChipFilter(
                             DropdownMenuItem(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = MaterialTheme.spacing.small, vertical = 1.dp)
+                                    .padding(
+                                        horizontal = MaterialTheme.spacing.small,
+                                        vertical = 1.dp
+                                    )
                                     .background(
-                                        color = if (isSelected) MaterialTheme.colorScheme.surfaceVariant
+                                        color = if (isSelected) Color(0x475D92).copy(alpha = 0.05f)
                                         else Color.Transparent,
                                         shape = MaterialTheme.shapes.medium,
                                     ),
