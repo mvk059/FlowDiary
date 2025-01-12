@@ -188,7 +188,7 @@ class HomeViewModel(
             val options = topicsChip.options.map {
                 if (it.id == id) it.copy(isSelected = it.isSelected.not())
                 else it
-            }
+            }.sortedBy { it.text }
 
             val selectedTopics = options
                 .filter { it.isSelected }
