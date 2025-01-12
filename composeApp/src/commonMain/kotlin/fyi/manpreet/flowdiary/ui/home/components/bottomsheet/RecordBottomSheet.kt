@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.composables.core.DragIndication
 import com.composables.core.ModalBottomSheet
+import com.composables.core.ModalSheetProperties
 import com.composables.core.Sheet
 import com.composables.core.SheetDetent.Companion.Hidden
 import com.composables.core.rememberModalBottomSheetState
@@ -60,6 +61,10 @@ fun RecordBottomSheet(
 
     ModalBottomSheet(
         state = sheetState,
+        properties = ModalSheetProperties().copy(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false,
+        ),
         onDismiss = { onDismiss(HomeEvent.FabBottomSheet.SheetHide) },
     ) {
 

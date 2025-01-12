@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +27,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import com.composables.core.DragIndication
 import com.composables.core.ModalBottomSheet
+import com.composables.core.ModalSheetProperties
 import com.composables.core.Sheet
 import com.composables.core.SheetDetent.Companion.Hidden
 import com.composables.core.rememberModalBottomSheetState
@@ -68,6 +70,10 @@ fun EmotionBottomSheet(
 
     ModalBottomSheet(
         state = sheetState,
+        properties = ModalSheetProperties().copy(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false,
+        ),
         onDismiss = { onDismiss(NewRecordEvent.FabBottomSheet.SheetHide) },
     ) {
 
