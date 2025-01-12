@@ -17,6 +17,7 @@ import flowdiary.composeapp.generated.resources.ic_sad
 import flowdiary.composeapp.generated.resources.ic_stressed
 import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
+import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
 import fyi.manpreet.flowdiary.ui.home.state.Recordings
 import fyi.manpreet.flowdiary.ui.theme.Excited35
 import fyi.manpreet.flowdiary.ui.theme.Excited80
@@ -104,6 +105,17 @@ fun formatRelativeDate(date: LocalDate): String {
         else -> "${date.dayOfWeek.toString().lowercase().capitalize()}, ${
             date.month.toString().take(3)
         } ${date.dayOfMonth}"
+    }
+}
+
+fun FilterOption.Options.toEmotionType(): EmotionType {
+    return when (id) {
+        1 -> EmotionType.Excited
+        2 -> EmotionType.Peaceful
+        3 -> EmotionType.Neutral
+        4 -> EmotionType.Sad
+        5 -> EmotionType.Stressed
+        else -> throw IllegalStateException("Unknown emotion type id: $id")
     }
 }
 

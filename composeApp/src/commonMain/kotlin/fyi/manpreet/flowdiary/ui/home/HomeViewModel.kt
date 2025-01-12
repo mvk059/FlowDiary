@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.ic_excited
+import flowdiary.composeapp.generated.resources.ic_hashtag
 import flowdiary.composeapp.generated.resources.ic_neutral
 import flowdiary.composeapp.generated.resources.ic_peaceful
 import flowdiary.composeapp.generated.resources.ic_sad
@@ -22,6 +23,8 @@ import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.home.state.HomeState
 import fyi.manpreet.flowdiary.ui.home.state.PlaybackState
 import fyi.manpreet.flowdiary.ui.home.state.Recordings
+import fyi.manpreet.flowdiary.ui.home.state.Topic
+import fyi.manpreet.flowdiary.util.toEmotionType
 import fyi.manpreet.flowdiary.util.toRecordingList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -70,6 +73,8 @@ class HomeViewModel(
     private val _playbackState = MutableStateFlow(PlaybackState.NotPlaying)
     val playbackState = _playbackState.asStateFlow()
 
+    private var originalRecordings: List<Audio> = emptyList()
+
     private var playbackJob: Job? = null
 
     init {
@@ -117,17 +122,32 @@ class HomeViewModel(
                 FilterOption.Options(id = 5, text = "Stressed", icon = Res.drawable.ic_stressed),
             )
         )
-        val topicChip = FilterOption(
-            title = "All Topics",
-            options = listOf(),
-        )
+
         viewModelScope.launch {
             val allRecordings: List<Audio> = repository.getAllRecordings()
+            originalRecordings = allRecordings
+
+            // Extract unique topics and convert to options
+            val uniqueTopics = allRecordings
+                .flatMap { it.topics }
+                .distinct()
+                .map { topic ->
+                    FilterOption.Options(
+                        id = topic.value.hashCode(),
+                        text = topic.value,
+                        icon = Res.drawable.ic_hashtag,
+                        isSelected = false
+                    )
+                }
+
             _homeState.update { state ->
                 state.copy(
                     recordings = allRecordings.toRecordingList(),
                     moodChip = moodChip,
-                    topicsChip = topicChip,
+                    topicsChip = FilterOption(
+                        title = "All Topics",
+                        options = uniqueTopics
+                    ),
                 )
             }
         }
@@ -137,24 +157,60 @@ class HomeViewModel(
         val moodChip = _homeState.value.moodChip
         require(moodChip != null) { "Mood chip can not be null." }
 
-        val options = moodChip.options.map {
-            if (it.id == id) it.copy(isSelected = it.isSelected.not())
-            else it
-        }
+        viewModelScope.launch {
 
-        _homeState.update { state -> state.copy(moodChip = state.moodChip?.copy(options = options)) }
+            val options: List<FilterOption.Options> = moodChip.options.map {
+                if (it.id == id) it.copy(isSelected = it.isSelected.not())
+                else it
+            }
+
+            val selectedEmotions = options.filter { it.isSelected }.map { it.toEmotionType() }
+
+            val filteredRecordings =
+                if (selectedEmotions.isEmpty()) originalRecordings.toRecordingList()
+                else originalRecordings.filter { it.emotionType in selectedEmotions }
+                    .toRecordingList()
+
+            _homeState.update { state ->
+                state.copy(
+                    moodChip = state.moodChip?.copy(options = options),
+                    recordings = filteredRecordings
+                )
+            }
+        }
     }
 
     private fun onTopicChipSelect(id: Int) {
         val topicsChip = _homeState.value.topicsChip
         require(topicsChip != null) { "Topic chip can not be null." }
 
-        val options = topicsChip.options.map {
-            if (it.id == id) it.copy(isSelected = it.isSelected.not())
-            else it
-        }
+        viewModelScope.launch {
+            val options = topicsChip.options.map {
+                if (it.id == id) it.copy(isSelected = it.isSelected.not())
+                else it
+            }
 
-        _homeState.update { state -> state.copy(moodChip = state.topicsChip?.copy(options = options)) }
+            val selectedTopics = options
+                .filter { it.isSelected }
+                .map { Topic(it.text) }
+
+            val filteredRecordings = if (selectedTopics.isEmpty()) {
+                originalRecordings.toRecordingList()
+            } else {
+                originalRecordings
+                    .filter { audio ->
+                        audio.topics.any { it in selectedTopics }
+                    }
+                    .toRecordingList()
+            }
+
+            _homeState.update { state ->
+                state.copy(
+                    topicsChip = state.topicsChip?.copy(options = options),
+                    recordings = filteredRecordings
+                )
+            }
+        }
     }
 
     private fun onMoodChipReset() {
@@ -170,7 +226,12 @@ class HomeViewModel(
         require(topicsChip != null) { "Topic chip can not be null." }
 
         val options = topicsChip.options.map { it.copy(isSelected = false) }
-        _homeState.update { state -> state.copy(moodChip = state.topicsChip?.copy(options = options)) }
+        _homeState.update { state ->
+            state.copy(
+                topicsChip = state.topicsChip?.copy(options = options),
+                recordings = originalRecordings.toRecordingList()
+            )
+        }
     }
 
     private fun onFabBottomSheetShow() {
@@ -221,7 +282,12 @@ class HomeViewModel(
             _recordingState.update { HomeEvent.AudioRecorder.Done }
             val (filePath, amplitudePath) = audioRecorder.stopRecording()
             Logger.i { "Audio recording done: $filePath" }
-            _homeState.update { it.copy(recordingPath = AudioPath(filePath), amplitudePath = amplitudePath) }
+            _homeState.update {
+                it.copy(
+                    recordingPath = AudioPath(filePath),
+                    amplitudePath = amplitudePath
+                )
+            }
         }
     }
 
