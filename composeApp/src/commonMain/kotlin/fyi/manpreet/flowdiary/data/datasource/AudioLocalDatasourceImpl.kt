@@ -30,12 +30,14 @@ class AudioLocalDatasourceImpl(
     }
 
     override suspend fun getAllRecordings(): List<AudioTable.AudioData> {
-        return storage.get()?.recordings?.map {
-            it.copy(
-                path = getRecordingPath(it.path),
-                amplitudePath = getRecordingPath(it.amplitudePath)
-            )
-        } ?: emptyList()
+        return storage.get()?.recordings
+            ?.sortedWith(compareByDescending { it.createdDateInMillis })
+            ?.map {
+                it.copy(
+                    path = getRecordingPath(it.path),
+                    amplitudePath = getRecordingPath(it.amplitudePath)
+                )
+            } ?: emptyList()
     }
 
     override suspend fun deleteRecordings(recordings: List<AudioTable.AudioData>) {
