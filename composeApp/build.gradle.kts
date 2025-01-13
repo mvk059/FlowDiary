@@ -1,6 +1,8 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -60,6 +62,8 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
 
+            implementation(libs.ktor.client.android)
+
             implementation(libs.kstore.file)
         }
         commonMain.dependencies {
@@ -85,15 +89,19 @@ kotlin {
             implementation(libs.koin.composeVM)
             implementation(libs.koin.composeVM.navigation)
 
+            implementation(libs.bundles.ktor.common)
+
             implementation(libs.kermit)
             implementation(libs.composables.core)
 
             implementation(project.dependencies.platform(libs.arrow.bom))
             implementation(libs.arrow.core)
             implementation(libs.kstore)
+            implementation(libs.groq)
         }
         iosMain.dependencies {
             implementation(libs.kstore.file)
+            implementation(libs.ktor.client.darwin)
         }
         wasmJsMain.dependencies {
             implementation(libs.kstore.storage)
@@ -106,12 +114,18 @@ android {
     namespace = "fyi.manpreet.flowdiary"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "fyi.manpreet.flowdiary"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "GROQ", "\"${getLocalProperty("groq")}\"")
     }
     packaging {
         resources {
@@ -127,6 +141,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+}
+
+fun getLocalProperty(key: String, defaultValue: String = ""): String {
+    val localProperties = Properties().apply {
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            load(FileInputStream(localPropertiesFile))
+        }
+    }
+    return localProperties.getProperty(key) ?: defaultValue
 }
 
 dependencies {
