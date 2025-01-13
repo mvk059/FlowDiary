@@ -25,7 +25,9 @@ import fyi.manpreet.flowdiary.data.model.AmplitudeData
 import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.data.repository.AudioRepository
+import fyi.manpreet.flowdiary.di.createGroqClient
 import fyi.manpreet.flowdiary.platform.audioplayer.AudioPlayer
+import fyi.manpreet.flowdiary.platform.environment.Environment
 import fyi.manpreet.flowdiary.platform.filemanager.FileManager
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.ui.components.emotion.Emotions
@@ -33,6 +35,8 @@ import fyi.manpreet.flowdiary.ui.home.state.PlaybackState
 import fyi.manpreet.flowdiary.ui.home.state.Topic
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordEvent
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordState
+import io.github.vyfor.groqkt.GroqClient
+import io.github.vyfor.groqkt.GroqModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,6 +54,7 @@ class NewRecordViewModel(
     private val repository: AudioRepository,
     private val audioPlayer: AudioPlayer,
     private val fileManager: FileManager,
+    private val environment: Environment,
 ) : ViewModel() {
 
     private val _recordingPath = MutableStateFlow<AudioPath?>(null)
@@ -70,6 +75,8 @@ class NewRecordViewModel(
     private var playbackJob: Job? = null
 
     private lateinit var navController: NavController
+
+    private val groqClient: GroqClient by lazy { createGroqClient(environment) }
 
     init {
         audioPlayer.setOnPlaybackCompleteListener {
@@ -99,6 +106,7 @@ class NewRecordViewModel(
             is NewRecordEvent.Data.Topics.IsAddingStatusChange -> onIsAddingStatusChange(event.status)
             is NewRecordEvent.Data.Topics.SearchQueryChanged -> onSearchQueryChanged(event.query)
             is NewRecordEvent.Data.UpdateDescription -> onDescriptionUpdated(event.description)
+            NewRecordEvent.Transcribe -> onTranscribe()
             NewRecordEvent.Save -> onSave()
             is NewRecordEvent.BackConfirm -> onBackConfirm(event.value)
             NewRecordEvent.NavigateBack -> onNavigateBack()
@@ -244,7 +252,12 @@ class NewRecordViewModel(
         val audioPath = _recordingPath.value
         requireNotNull(audioPath) { "Audio path can not be null." }
         audioPlayer.play(audioPath.value)
-        _playbackState.update { PlaybackState(playingId = PlaybackState.DEFAULT_ID, position = Duration.ZERO) }
+        _playbackState.update {
+            PlaybackState(
+                playingId = PlaybackState.DEFAULT_ID,
+                position = Duration.ZERO
+            )
+        }
         startPositionUpdates(PlaybackState.DEFAULT_ID)
     }
 
@@ -270,6 +283,17 @@ class NewRecordViewModel(
                 }
                 delay(100) // Update every 100ms
             }
+        }
+    }
+
+    private fun onTranscribe() {
+        viewModelScope.launch {
+            val result = groqClient.transcribeAudio {
+                model = GroqModel.DISTIL_WHISPER_LARGE_V3_EN
+                file(_recordingPath.value?.value ?: "")
+            }
+            val data = result.getOrNull()?.data
+            _newRecordState.update { it?.copy(description = data?.text ?: "") }
         }
     }
 

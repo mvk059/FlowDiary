@@ -30,6 +30,7 @@ sealed interface NewRecordEvent {
         data object Pause : AudioPlayer
     }
 
+    data object Transcribe : NewRecordEvent
     data object Save : NewRecordEvent
     data class BackConfirm(val value: Boolean) : NewRecordEvent
     data object NavigateBack : NewRecordEvent

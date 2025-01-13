@@ -10,7 +10,11 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,13 +24,18 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.common_cancel
 import flowdiary.composeapp.generated.resources.common_save
+import flowdiary.composeapp.generated.resources.ic_ai
 import flowdiary.composeapp.generated.resources.ic_edit
 import flowdiary.composeapp.generated.resources.ic_hashtag
 import flowdiary.composeapp.generated.resources.new_record_add_description
@@ -47,7 +56,9 @@ import fyi.manpreet.flowdiary.ui.newrecord.components.textfield.TopicTextField
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordEvent
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordState
 import fyi.manpreet.flowdiary.ui.theme.spacing
+import fyi.manpreet.flowdiary.util.getIconColor
 import fyi.manpreet.flowdiary.util.noRippleClickable
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration
@@ -78,6 +89,7 @@ fun NewRecordScreen(
         onSearchQueryChange = viewModel::onEvent,
         onDescriptionUpdate = viewModel::onEvent,
         onAudioPlayerEvent = viewModel::onEvent,
+        onTranscribe = viewModel::onEvent,
         onSave = viewModel::onEvent,
         onTopBarBackClick = viewModel::onEvent,
         onBackConfirm = viewModel::onEvent,
@@ -99,6 +111,7 @@ fun NewRecordScreenContent(
     onSearchQueryChange: (NewRecordEvent.Data.Topics) -> Unit,
     onDescriptionUpdate: (NewRecordEvent.Data) -> Unit,
     onAudioPlayerEvent: (NewRecordEvent.AudioPlayer) -> Unit,
+    onTranscribe: (NewRecordEvent) -> Unit,
     onSave: (NewRecordEvent.Save) -> Unit,
     onTopBarBackClick: (NewRecordEvent) -> Unit,
     onBackConfirm: (NewRecordEvent) -> Unit,
@@ -138,11 +151,20 @@ fun NewRecordScreenContent(
             )
 
             Row(
-                modifier =  Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = MaterialTheme.spacing.large,
+                        end = MaterialTheme.spacing.medium
+                    ),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
 
                 AudioPlayer(
-                    modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large),
+                    modifier = Modifier
+                        .padding(end = MaterialTheme.spacing.small)
+                        .weight(1f),
                     amplitudeData = newRecordState.value?.amplitudeData ?: emptyList(),
                     isPlaying = playbackState.value.playingId != null,
                     emotionType = newRecordState.value?.emotionType,
@@ -154,10 +176,38 @@ fun NewRecordScreenContent(
                     },
                     onSeek = {}
                 )
+
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .shadow(
+                            elevation = MaterialTheme.spacing.small,
+                            shape = CircleShape,
+                            spotColor = Color.Black.copy(alpha = 0.25f)
+                        )
+                        .clip(CircleShape)
+                ) {
+                    IconButton(
+                        modifier = Modifier.background(MaterialTheme.colorScheme.onPrimary),
+                        onClick = { onTranscribe(NewRecordEvent.Transcribe) },
+                        content = {
+                            Icon(
+                                painter = painterResource(resource = Res.drawable.ic_ai),
+                                contentDescription = null,
+                                modifier = Modifier,
+                                tint = newRecordState.value?.emotionType?.getIconColor()
+                                    ?: MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    )
+                }
             }
 
             TopicTextField(
-                modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large, vertical = MaterialTheme.spacing.small),
+                modifier = Modifier.padding(
+                    horizontal = MaterialTheme.spacing.large,
+                    vertical = MaterialTheme.spacing.small
+                ),
                 icon = Res.drawable.ic_hashtag,
                 selectedTopics = newRecordState.value?.selectedTopics ?: emptySet(),
                 onSelectedTopicChange = onSelectedTopicChange,
