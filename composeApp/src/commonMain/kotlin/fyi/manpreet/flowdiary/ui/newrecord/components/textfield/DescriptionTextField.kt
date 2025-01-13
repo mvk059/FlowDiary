@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -34,6 +35,7 @@ fun DescriptionTextField(
     descriptionText: String,
     onDescriptionUpdate: (NewRecordEvent.Data) -> Unit,
     icon: DrawableResource,
+    iconTint: Color?,
     hintText: StringResource,
     imeAction: ImeAction = ImeAction.Done,
     descriptionFieldFocusRequester: FocusRequester,
@@ -50,7 +52,7 @@ fun DescriptionTextField(
             painter = painterResource(icon),
             modifier = Modifier.size(MaterialTheme.spacing.large),
             contentDescription = null,
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.outlineVariant),
+            colorFilter = ColorFilter.tint(iconTint ?: MaterialTheme.colorScheme.outlineVariant),
         )
 
         BasicTextField(

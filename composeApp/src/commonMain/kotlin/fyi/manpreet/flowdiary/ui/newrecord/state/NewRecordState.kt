@@ -17,6 +17,7 @@ data class NewRecordState(
     val isAddingTopic: Boolean = false,
     val searchQuery: String = "",
     val description: String = "",
+    val isAITranscribeUsed: Boolean = false,
     val amplitudeData: List<AmplitudeData> = emptyList(),
     val totalDuration: Duration? = null,
     val onBackConfirm: Boolean = false,

@@ -225,7 +225,12 @@ fun NewRecordScreenContent(
                 modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large),
                 descriptionText = newRecordState.value?.description ?: "",
                 onDescriptionUpdate = onDescriptionUpdate,
-                icon = Res.drawable.ic_edit,
+                icon =
+                    if (newRecordState.value?.isAITranscribeUsed == true) Res.drawable.ic_ai
+                    else Res.drawable.ic_edit,
+                iconTint =
+                    if (newRecordState.value?.isAITranscribeUsed == true) newRecordState.value?.emotionType?.getIconColor()
+                    else MaterialTheme.colorScheme.outlineVariant,
                 hintText = Res.string.new_record_add_description,
                 imeAction = ImeAction.Done,
                 descriptionFieldFocusRequester = descriptionFieldFocusRequester,

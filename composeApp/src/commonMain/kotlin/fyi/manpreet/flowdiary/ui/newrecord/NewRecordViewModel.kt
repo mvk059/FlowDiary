@@ -293,7 +293,12 @@ class NewRecordViewModel(
                 file(_recordingPath.value?.value ?: "")
             }
             val data = result.getOrNull()?.data
-            _newRecordState.update { it?.copy(description = data?.text ?: "") }
+            _newRecordState.update {
+                it?.copy(
+                    description = data?.text ?: "",
+                    isAITranscribeUsed = true
+                )
+            }
         }
     }
 
