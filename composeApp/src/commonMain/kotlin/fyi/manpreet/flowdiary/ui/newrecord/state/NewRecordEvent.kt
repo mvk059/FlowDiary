@@ -25,6 +25,11 @@ sealed interface NewRecordEvent {
         data object SheetHide : FabBottomSheet
     }
 
+    sealed interface AudioPlayer : NewRecordEvent {
+        data object Play : AudioPlayer
+        data object Pause : AudioPlayer
+    }
+
     data object Save : NewRecordEvent
     data class BackConfirm(val value: Boolean) : NewRecordEvent
     data object NavigateBack : NewRecordEvent

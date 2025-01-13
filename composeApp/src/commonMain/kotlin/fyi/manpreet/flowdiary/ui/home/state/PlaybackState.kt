@@ -11,5 +11,6 @@ data class PlaybackState(
 ) {
     companion object {
         val NotPlaying = PlaybackState(null, Duration.ZERO)
+        const val DEFAULT_ID = 1L
     }
 }

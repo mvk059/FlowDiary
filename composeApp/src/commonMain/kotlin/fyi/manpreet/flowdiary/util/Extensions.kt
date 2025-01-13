@@ -3,6 +3,7 @@ package fyi.manpreet.flowdiary.util
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -129,32 +130,38 @@ fun EmotionType.getDrawableResource(): DrawableResource {
     }
 }
 
-fun EmotionType.getBackgroundColor(): Color {
+@Composable
+fun EmotionType?.getBackgroundColor(): Color {
     return when (this) {
         EmotionType.Excited -> Excited95
         EmotionType.Peaceful -> Peaceful95
         EmotionType.Neutral -> Neutral95
         EmotionType.Sad -> Sad95
         EmotionType.Stressed -> Stressed95
+        else -> MaterialTheme.colorScheme.inverseOnSurface
     }
 }
 
-fun EmotionType.getPlaybackBackgroundColor(): Color {
+@Composable
+fun EmotionType?.getPlaybackBackgroundColor(): Color {
     return when (this) {
         EmotionType.Excited -> Excited80
         EmotionType.Peaceful -> Peaceful80
         EmotionType.Neutral -> Neutral80
         EmotionType.Sad -> Sad80
         EmotionType.Stressed -> Stressed80
+        else -> MaterialTheme.colorScheme.inversePrimary
     }
 }
 
-fun EmotionType.getIconColor(): Color {
+@Composable
+fun EmotionType?.getIconColor(): Color {
     return when (this) {
         EmotionType.Excited -> Excited35
         EmotionType.Peaceful -> Peaceful35
         EmotionType.Neutral -> Neutral35
         EmotionType.Sad -> Sad35
         EmotionType.Stressed -> Stressed35
+        else -> MaterialTheme.colorScheme.primary
     }
 }

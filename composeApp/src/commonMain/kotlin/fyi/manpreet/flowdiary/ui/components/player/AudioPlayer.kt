@@ -46,7 +46,7 @@ fun AudioPlayer(
     modifier: Modifier = Modifier,
     amplitudeData: List<AmplitudeData>,
     isPlaying: Boolean,
-    emotionType: EmotionType,
+    emotionType: EmotionType?,
     currentPosition: Duration,
     totalDuration: Duration,
     onPlayPauseClick: () -> Unit,

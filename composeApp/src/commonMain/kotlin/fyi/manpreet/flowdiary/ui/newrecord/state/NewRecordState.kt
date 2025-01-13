@@ -1,9 +1,11 @@
 package fyi.manpreet.flowdiary.ui.newrecord.state
 
 import androidx.compose.runtime.Stable
+import fyi.manpreet.flowdiary.data.model.AmplitudeData
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.ui.components.emotion.Emotions
 import fyi.manpreet.flowdiary.ui.home.state.Topic
+import kotlin.time.Duration
 
 @Stable
 data class NewRecordState(
@@ -15,6 +17,8 @@ data class NewRecordState(
     val isAddingTopic: Boolean = false,
     val searchQuery: String = "",
     val description: String = "",
+    val amplitudeData: List<AmplitudeData> = emptyList(),
+    val totalDuration: Duration? = null,
     val onBackConfirm: Boolean = false,
     val isEmotionSaveButtonEnabled: Boolean = false,
     val isSaveButtonEnabled: Boolean = false,

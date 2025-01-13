@@ -35,6 +35,8 @@ import flowdiary.composeapp.generated.resources.new_record_appbar_title
 import flowdiary.composeapp.generated.resources.new_record_title_cd
 import fyi.manpreet.flowdiary.data.model.AudioPath
 import fyi.manpreet.flowdiary.ui.components.appbar.CenterTopAppBar
+import fyi.manpreet.flowdiary.ui.components.player.AudioPlayer
+import fyi.manpreet.flowdiary.ui.home.state.PlaybackState
 import fyi.manpreet.flowdiary.ui.newrecord.components.bottomsheet.EmotionBottomSheet
 import fyi.manpreet.flowdiary.ui.newrecord.components.button.ButtonDisabledNoRipple
 import fyi.manpreet.flowdiary.ui.newrecord.components.button.ButtonPrimaryEnabledNoRipple
@@ -48,6 +50,7 @@ import fyi.manpreet.flowdiary.ui.theme.spacing
 import fyi.manpreet.flowdiary.util.noRippleClickable
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Duration
 
 @Composable
 fun NewRecordScreen(
@@ -57,14 +60,16 @@ fun NewRecordScreen(
     amplitudePath: String,
 ) {
 
-    val newRecordState = viewModel.newRecordState.collectAsStateWithLifecycle()
-
     LaunchedEffect(Unit) {
         viewModel.savePath(path, amplitudePath, navController)
     }
 
+    val newRecordState = viewModel.newRecordState.collectAsStateWithLifecycle()
+    val playbackState = viewModel.playbackState.collectAsStateWithLifecycle()
+
     NewRecordScreenContent(
         newRecordState = newRecordState,
+        playbackState = playbackState,
         onTitleUpdate = viewModel::onEvent,
         onEmotionTypeSelect = viewModel::onEvent,
         onSelectedTopicChange = viewModel::onEvent,
@@ -72,6 +77,7 @@ fun NewRecordScreen(
         onAddingTopicChange = viewModel::onEvent,
         onSearchQueryChange = viewModel::onEvent,
         onDescriptionUpdate = viewModel::onEvent,
+        onAudioPlayerEvent = viewModel::onEvent,
         onSave = viewModel::onEvent,
         onTopBarBackClick = viewModel::onEvent,
         onBackConfirm = viewModel::onEvent,
@@ -84,6 +90,7 @@ fun NewRecordScreen(
 @Composable
 fun NewRecordScreenContent(
     newRecordState: State<NewRecordState?>,
+    playbackState: State<PlaybackState>,
     onTitleUpdate: (NewRecordEvent.Data) -> Unit,
     onEmotionTypeSelect: (NewRecordEvent.Data) -> Unit,
     onSelectedTopicChange: (NewRecordEvent.Data.Topics) -> Unit,
@@ -91,6 +98,7 @@ fun NewRecordScreenContent(
     onAddingTopicChange: (NewRecordEvent.Data.Topics) -> Unit,
     onSearchQueryChange: (NewRecordEvent.Data.Topics) -> Unit,
     onDescriptionUpdate: (NewRecordEvent.Data) -> Unit,
+    onAudioPlayerEvent: (NewRecordEvent.AudioPlayer) -> Unit,
     onSave: (NewRecordEvent.Save) -> Unit,
     onTopBarBackClick: (NewRecordEvent) -> Unit,
     onBackConfirm: (NewRecordEvent) -> Unit,
@@ -129,8 +137,27 @@ fun NewRecordScreenContent(
                 isEmotionSelected = newRecordState.value?.isEmotionSaveButtonEnabled
             )
 
+            Row(
+                modifier =  Modifier.fillMaxWidth(),
+            ) {
+
+                AudioPlayer(
+                    modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large),
+                    amplitudeData = newRecordState.value?.amplitudeData ?: emptyList(),
+                    isPlaying = playbackState.value.playingId != null,
+                    emotionType = newRecordState.value?.emotionType,
+                    currentPosition = playbackState.value.position,
+                    totalDuration = newRecordState.value?.totalDuration ?: Duration.ZERO,
+                    onPlayPauseClick = {
+                        if (playbackState.value.playingId != null) onAudioPlayerEvent(NewRecordEvent.AudioPlayer.Pause)
+                        else onAudioPlayerEvent(NewRecordEvent.AudioPlayer.Play)
+                    },
+                    onSeek = {}
+                )
+            }
+
             TopicTextField(
-                modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large),
+                modifier = Modifier.padding(horizontal = MaterialTheme.spacing.large, vertical = MaterialTheme.spacing.small),
                 icon = Res.drawable.ic_hashtag,
                 selectedTopics = newRecordState.value?.selectedTopics ?: emptySet(),
                 onSelectedTopicChange = onSelectedTopicChange,

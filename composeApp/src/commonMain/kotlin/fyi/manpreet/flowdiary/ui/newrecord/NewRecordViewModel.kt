@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import arrow.core.raise.either
+import co.touchlab.kermit.Logger
 import flowdiary.composeapp.generated.resources.Res
 import flowdiary.composeapp.generated.resources.ic_excited
 import flowdiary.composeapp.generated.resources.ic_excited_outline
@@ -28,16 +29,22 @@ import fyi.manpreet.flowdiary.platform.audioplayer.AudioPlayer
 import fyi.manpreet.flowdiary.platform.filemanager.FileManager
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
 import fyi.manpreet.flowdiary.ui.components.emotion.Emotions
+import fyi.manpreet.flowdiary.ui.home.state.PlaybackState
 import fyi.manpreet.flowdiary.ui.home.state.Topic
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordEvent
 import fyi.manpreet.flowdiary.ui.newrecord.state.NewRecordState
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
 
 class NewRecordViewModel(
     private val repository: AudioRepository,
@@ -57,7 +64,24 @@ class NewRecordViewModel(
             initialValue = NewRecordState()
         )
 
+    private val _playbackState = MutableStateFlow(PlaybackState.NotPlaying)
+    val playbackState = _playbackState.asStateFlow()
+
+    private var playbackJob: Job? = null
+
     private lateinit var navController: NavController
+
+    init {
+        audioPlayer.setOnPlaybackCompleteListener {
+            onStop()
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioPlayer.release()
+        playbackJob?.cancel()
+    }
 
     fun savePath(path: AudioPath, amplitudePath: String, navController: NavController) {
         _recordingPath.update { path }
@@ -80,6 +104,8 @@ class NewRecordViewModel(
             NewRecordEvent.NavigateBack -> onNavigateBack()
             NewRecordEvent.FabBottomSheet.SheetShow -> onShowBottomSheet()
             NewRecordEvent.FabBottomSheet.SheetHide -> onHideBottomSheet()
+            NewRecordEvent.AudioPlayer.Play -> onPlay()
+            NewRecordEvent.AudioPlayer.Pause -> onPause()
         }
     }
 
@@ -131,6 +157,8 @@ class NewRecordViewModel(
                     emotionType = defaultEmotion,
                     selectedTopics = selectedTopics,
                     savedTopics = savedTopics,
+                    totalDuration = audioPlayer.getAudioDuration(_recordingPath.value?.value ?: ""),
+                    amplitudeData = getAmplitudeData(_amplitudePath.value ?: ""),
                     fabState = NewRecordEvent.FabBottomSheet.SheetShow,
                     isEmotionSaveButtonEnabled = defaultEmotion != null,
                 )
@@ -209,6 +237,40 @@ class NewRecordViewModel(
 
     private fun onDescriptionUpdated(description: String) {
         _newRecordState.update { state -> state?.copy(description = description) }
+    }
+
+    private fun onPlay() {
+        playbackJob?.cancel()
+        val audioPath = _recordingPath.value
+        requireNotNull(audioPath) { "Audio path can not be null." }
+        audioPlayer.play(audioPath.value)
+        _playbackState.update { PlaybackState(playingId = PlaybackState.DEFAULT_ID, position = Duration.ZERO) }
+        startPositionUpdates(PlaybackState.DEFAULT_ID)
+    }
+
+    private fun onPause() {
+        audioPlayer.stop()
+        playbackJob?.cancel()
+        _playbackState.update { PlaybackState.NotPlaying }
+    }
+
+    private fun onStop() {
+        playbackJob?.cancel()
+        _playbackState.update { PlaybackState.NotPlaying }
+    }
+
+    private fun startPositionUpdates(id: Long) {
+        playbackJob?.cancel()
+        playbackJob = viewModelScope.launch {
+            while (isActive) {
+                if (_playbackState.value.playingId == id && !_playbackState.value.isSeeking) {
+                    val currentPosition = audioPlayer.getCurrentPosition()
+                    Logger.i { "NVM Position : $currentPosition, $id" }
+                    _playbackState.update { it.copy(position = currentPosition) }
+                }
+                delay(100) // Update every 100ms
+            }
+        }
     }
 
     private fun onSave() {
