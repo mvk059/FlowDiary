@@ -1,12 +1,16 @@
 package fyi.manpreet.flowdiary.ui.home.components.fab
 
-import androidx.compose.foundation.background
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Mic
@@ -30,55 +34,73 @@ fun GradientFAB(
     isPlaying: Boolean,
     onClick: () -> Unit,
 ) {
-
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    val gradient =
-        if (isPressed) MaterialTheme.gradient.buttonPressed
-        else MaterialTheme.gradient.button
+    val gradient = if (isPressed) MaterialTheme.gradient.buttonPressed
+    else MaterialTheme.gradient.button
 
-    val backgroundSecondLevel = if (isPlaying) Color(0xFFEEF0FF) else Color.Transparent
-    val backgroundFirstLevel = if (isPlaying) Color(0xFFD9E2FF) else Color.Transparent
-    val icon = if (isPlaying) Icons.Default.Done else Icons.Default.Mic
-
-    Box(
-        modifier = modifier.size(MaterialTheme.spacing.large6XL)
-    ) {
-        // Second level (larger outer gradient shadow)
-        Box(
-            modifier = Modifier
-                .size(MaterialTheme.spacing.large6XL)
-                .align(Alignment.Center)
-                .background(color = backgroundSecondLevel, shape = CircleShape)
+    val infiniteTransition = rememberInfiniteTransition()
+    val firstCircleScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000),
+            repeatMode = RepeatMode.Reverse
         )
-
-        // First level (smaller inner gradient shadow)
-        Box(
-            modifier = Modifier
-                .size(MaterialTheme.spacing.large5XL)
-                .align(Alignment.Center)
-                .background(color = backgroundFirstLevel, shape = CircleShape)
+    )
+    val secondCircleScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.3f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, delayMillis = 100),
+            repeatMode = RepeatMode.Reverse
         )
+    )
 
-        // Main FAB
-        Box(
+    Box {
+
+        Canvas(
             modifier = modifier
-                .size(MaterialTheme.spacing.large3XL)
-                .align(Alignment.Center)
-                .background(brush = gradient, shape = CircleShape)
+                .size(MaterialTheme.spacing.large6XL)
                 .clickable(
                     interactionSource = interactionSource,
                     indication = null,
-                    onClick = onClick,
-                ),
-            contentAlignment = Alignment.Center,
+                    onClick = onClick
+                )
         ) {
+            if (isPlaying) {
+                // Second level circle
+                drawCircle(
+                    color = Color(0xFFEEF0FF),
+                    radius = (size.minDimension / 2) * secondCircleScale,
+                    alpha = 0.5f
+                )
+                // First level circle
+                drawCircle(
+                    color = Color(0xFFD9E2FF),
+                    radius = (size.minDimension / 2.2f) * firstCircleScale,
+                    alpha = 0.7f
+                )
+            }
 
+            // Main FAB
+            drawCircle(
+                brush = gradient,
+                radius = size.minDimension / 3f
+            )
+        }
+
+        // Icon overlay
+        Box(
+            modifier = Modifier
+                .size(MaterialTheme.spacing.large3XL)
+                .align(Alignment.Center),
+            contentAlignment = Alignment.Center
+        ) {
             Icon(
-                modifier = Modifier.align(Alignment.Center),
-                imageVector = icon,
+                imageVector = if (isPlaying) Icons.Default.Done else Icons.Default.Mic,
                 contentDescription = stringResource(Res.string.fab_cd),
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
