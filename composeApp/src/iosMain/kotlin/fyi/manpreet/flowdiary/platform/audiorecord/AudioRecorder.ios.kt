@@ -121,6 +121,7 @@ actual class AudioRecorder {
     actual suspend fun stopRecording(): Pair<String, String> {
         amplitudeJob?.cancel()
         audioRecorder?.stop()
+        isPausedState = false
         val path = currentUrl?.path ?: throw IllegalStateException("Recording was not started")
         val amplitudesPath =
             amplitudesUrl?.path ?: throw IllegalStateException("Amplitudes file not created")

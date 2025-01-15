@@ -47,10 +47,14 @@ actual class AudioRecorder(
         amplitudeJob = CoroutineScope(Dispatchers.IO).launch {
             while (isActive && isRecording()) {
                 if (!isPaused()) {
-                    val amplitude = mediaRecorder?.maxAmplitude?.toFloat() ?: 0f
-                    if (amplitude > 0) {
-                        val normalized = (log10(amplitude + 1) / log10(32767f + 1)).coerceIn(0f, 1f)
-                        amplitudesFile?.appendText("$normalized,")
+                    try {
+                        val amplitude = mediaRecorder?.maxAmplitude?.toFloat() ?: 0f
+                        if (amplitude > 0) {
+                            val normalized = (log10(amplitude + 1) / log10(32767f + 1)).coerceIn(0f, 1f)
+                            amplitudesFile?.appendText("$normalized,")
+                        }
+                    } catch (e: Exception) {
+                        stopRecording()
                     }
                 }
                 delay(100)
@@ -67,6 +71,7 @@ actual class AudioRecorder(
         }
         mediaRecorder = null
         isCurrentlyRecording = false
+        isPausedState = false
         val amplitudesFilePath = amplitudesFile?.absolutePath
 
         requireNotNull(currentFilePath) { "Current file path is null" }
