@@ -39,15 +39,17 @@ import fyi.manpreet.flowdiary.ui.home.components.fab.GradientFAB
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.theme.spacing
 import fyi.manpreet.flowdiary.util.Peek
+import fyi.manpreet.flowdiary.util.formatDuration
 import org.jetbrains.compose.resources.stringResource
+import kotlin.time.Duration
 
 @Composable
 fun RecordBottomSheet(
     modifier: Modifier = Modifier,
+    recordTime: Duration,
     fabState: HomeEvent.FabBottomSheet,
     audioEvent: HomeEvent.AudioRecorder,
     onAudioEvent: (HomeEvent.AudioRecorder) -> Unit,
-    onDismiss: (HomeEvent.FabBottomSheet) -> Unit,
 ) {
 
     val sheetState = rememberModalBottomSheetState(
@@ -65,7 +67,7 @@ fun RecordBottomSheet(
             dismissOnBackPress = false,
             dismissOnClickOutside = false,
         ),
-        onDismiss = { onDismiss(HomeEvent.FabBottomSheet.SheetHide) },
+        onDismiss = { onAudioEvent(HomeEvent.AudioRecorder.Cancel) },
     ) {
 
         Sheet(
@@ -112,7 +114,7 @@ fun RecordBottomSheet(
                     )
 
                     Text(
-                        text = "01:30:45",
+                        text = recordTime.formatDuration(),
                         modifier = Modifier.padding(top = MaterialTheme.spacing.small),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -131,7 +133,7 @@ fun RecordBottomSheet(
                                     shape = CircleShape
                                 )
                                 .size(MaterialTheme.spacing.large2XL),
-                            onClick = { onDismiss(HomeEvent.FabBottomSheet.SheetHide) },
+                            onClick = { onAudioEvent(HomeEvent.AudioRecorder.Cancel) },
                             content = {
                                 Icon(
                                     imageVector = Icons.Default.Close,
@@ -163,9 +165,8 @@ fun RecordBottomSheet(
                                 )
                                 .size(MaterialTheme.spacing.large2XL),
                             onClick = {
-                                if (audioEvent == HomeEvent.AudioRecorder.Pause) onAudioEvent(
-                                    HomeEvent.AudioRecorder.Done
-                                )
+                                if (audioEvent == HomeEvent.AudioRecorder.Pause)
+                                    onAudioEvent(HomeEvent.AudioRecorder.Done)
                                 else onAudioEvent(HomeEvent.AudioRecorder.Pause)
                             },
                             content = {

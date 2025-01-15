@@ -29,6 +29,7 @@ import fyi.manpreet.flowdiary.ui.home.components.list.TimelineItem
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.home.state.HomeState
 import fyi.manpreet.flowdiary.ui.home.state.PlaybackState
+import fyi.manpreet.flowdiary.ui.home.state.RecordingState
 import fyi.manpreet.flowdiary.ui.home.state.Recordings
 import fyi.manpreet.flowdiary.ui.theme.gradient
 import fyi.manpreet.flowdiary.ui.theme.spacing
@@ -46,7 +47,7 @@ fun HomeScreen(
     val permissionStatus = viewModel.permissionStatus.collectAsStateWithLifecycle()
     val recordingState = viewModel.recordingState.collectAsStateWithLifecycle()
 
-    if (recordingState.value == HomeEvent.AudioRecorder.Done) {
+    if (recordingState.value.state == HomeEvent.AudioRecorder.Done) {
         viewModel.onEvent(HomeEvent.AudioRecorder.Idle)
         val path = homeState.value.recordingPath
         val amplitudeData = homeState.value.amplitudePath
@@ -67,7 +68,6 @@ fun HomeScreen(
         onAudioEvent = viewModel::onEvent,
         onAudioPlayerEvent = viewModel::onEvent,
         onBottomSheetShow = viewModel::onEvent,
-        onBottomSheetDismiss = viewModel::onEvent,
         onSettingsClick = onSettingsClick,
         onPermissionSettingsSelect = viewModel::onEvent,
         onPermissionDismissSelect = viewModel::onEvent,
@@ -78,7 +78,7 @@ fun HomeScreen(
 fun HomeScreenContent(
     homeState: State<HomeState>,
     permissionStatus: State<PermissionState>,
-    recordingState: State<HomeEvent.AudioRecorder>,
+    recordingState: State<RecordingState>,
     playbackState: State<PlaybackState>,
     onMoodChipItemSelect: (HomeEvent.Chip) -> Unit,
     onTopicChipItemSelect: (HomeEvent.Chip) -> Unit,
@@ -87,7 +87,6 @@ fun HomeScreenContent(
     onAudioEvent: (HomeEvent.AudioRecorder) -> Unit,
     onAudioPlayerEvent: (HomeEvent.AudioPlayer) -> Unit,
     onBottomSheetShow: (HomeEvent.FabBottomSheet) -> Unit,
-    onBottomSheetDismiss: (HomeEvent.FabBottomSheet) -> Unit,
     onSettingsClick: () -> Unit,
     onPermissionSettingsSelect: (HomeEvent.Permission) -> Unit,
     onPermissionDismissSelect: (HomeEvent.Permission) -> Unit,
@@ -130,9 +129,9 @@ fun HomeScreenContent(
         }
 
         RecordBottomSheet(
+            recordTime = recordingState.value.recordingTime,
             fabState = homeState.value.fabBottomSheet,
-            onDismiss = onBottomSheetDismiss,
-            audioEvent = recordingState.value,
+            audioEvent = recordingState.value.state,
             onAudioEvent = onAudioEvent,
         )
     }

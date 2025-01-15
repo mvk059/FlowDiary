@@ -22,10 +22,13 @@ import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.home.state.HomeState
 import fyi.manpreet.flowdiary.ui.home.state.PlaybackState
+import fyi.manpreet.flowdiary.ui.home.state.RecordingState
 import fyi.manpreet.flowdiary.ui.home.state.Recordings
 import fyi.manpreet.flowdiary.ui.home.state.Topic
 import fyi.manpreet.flowdiary.util.toEmotionType
 import fyi.manpreet.flowdiary.util.toRecordingList
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,6 +43,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class HomeViewModel(
     private val audioPlayer: AudioPlayer, // TODO Use case
@@ -66,9 +70,8 @@ class HomeViewModel(
             initialValue = PermissionState.NOT_DETERMINED
         )
 
-    private val _recordingState =
-        MutableStateFlow<HomeEvent.AudioRecorder>(HomeEvent.AudioRecorder.Idle)
-    val recordingState: StateFlow<HomeEvent.AudioRecorder> = _recordingState.asStateFlow()
+    private val _recordingState = MutableStateFlow(RecordingState())
+    val recordingState: StateFlow<RecordingState> = _recordingState.asStateFlow()
 
     private val _playbackState = MutableStateFlow(PlaybackState.NotPlaying)
     val playbackState = _playbackState.asStateFlow()
@@ -76,6 +79,7 @@ class HomeViewModel(
     private var originalRecordings: List<Audio> = emptyList()
 
     private var playbackJob: Job? = null
+    private var recordingJob: Job? = null
 
     init {
         audioPlayer.setOnPlaybackCompleteListener {
@@ -246,42 +250,72 @@ class HomeViewModel(
     }
 
     private fun onAudioRecordIdle() {
-        _recordingState.update { HomeEvent.AudioRecorder.Idle }
+        _recordingState.update { it.copy(state = HomeEvent.AudioRecorder.Idle) }
         onFabBottomSheetHide()
     }
 
     private fun onAudioRecordStart() {
         viewModelScope.launch {
-            _recordingState.update { HomeEvent.AudioRecorder.Record }
+            _recordingState.update { it.copy(state = HomeEvent.AudioRecorder.Record) }
             if (audioRecorder.isPaused()) {
+                updateRecordingState()
                 audioRecorder.resumeRecording()
             } else {
                 val fileName = "recording_${Clock.System.now().toEpochMilliseconds()}.m4a"
                 audioRecorder.startRecording(fileName)
+                updateRecordingState()
             }
         }
+    }
+
+    private fun updateRecordingState() {
+        recordingJob = CoroutineScope(Dispatchers.Main).launch {
+            while (isActive) {
+                delay(1.seconds)
+                _recordingState.update { it.copy(recordingTime = it.recordingTime.plus(1.seconds)) }
+            }
+        }
+    }
+
+    private fun cancelRecordingJob() {
+        recordingJob?.cancel()
+        recordingJob = null
     }
 
     private fun onAudioRecordPause() {
         if (audioRecorder.isRecording().not()) return
         viewModelScope.launch {
-            _recordingState.update { HomeEvent.AudioRecorder.Pause }
             audioRecorder.pauseRecording()
+            cancelRecordingJob()
+            _recordingState.update { it.copy(state = HomeEvent.AudioRecorder.Pause) }
         }
     }
 
     private fun onAudioRecordCancel() {
         viewModelScope.launch {
-            _recordingState.update { HomeEvent.AudioRecorder.Cancel }
             audioRecorder.discardRecording()
         }
+        cancelRecordingJob()
+        _recordingState.update {
+            it.copy(
+                recordingTime = Duration.ZERO,
+                state = HomeEvent.AudioRecorder.Cancel
+            )
+        }
+        onFabBottomSheetHide()
     }
 
     private fun onAudioRecordDone() {
         viewModelScope.launch {
-            _recordingState.update { HomeEvent.AudioRecorder.Done }
             val (filePath, amplitudePath) = audioRecorder.stopRecording()
             Logger.i { "Audio recording done: $filePath" }
+            cancelRecordingJob()
+            _recordingState.update {
+                it.copy(
+                    recordingTime = Duration.ZERO,
+                    state = HomeEvent.AudioRecorder.Done,
+                )
+            }
             _homeState.update {
                 it.copy(
                     recordingPath = AudioPath(filePath),
@@ -385,6 +419,7 @@ class HomeViewModel(
 
     private fun onReload() {
         onFabBottomSheetHide()
+        onAudioRecordIdle()
     }
 
     private fun showSheetAndStartRecording() {
