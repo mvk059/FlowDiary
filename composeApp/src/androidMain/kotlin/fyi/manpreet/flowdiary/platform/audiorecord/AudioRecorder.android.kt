@@ -50,11 +50,11 @@ actual class AudioRecorder(
                     try {
                         val amplitude = mediaRecorder?.maxAmplitude?.toFloat() ?: 0f
                         if (amplitude > 0) {
-                            val normalized = (log10(amplitude + 1) / log10(32767f + 1)).coerceIn(0f, 1f)
+                            val normalized =
+                                (log10(amplitude + 1) / log10(32767f + 1)).coerceIn(0f, 1f)
                             amplitudesFile?.appendText("$normalized,")
                         }
-                    } catch (e: Exception) {
-                        stopRecording()
+                    } catch (_: Exception) {
                     }
                 }
                 delay(100)
