@@ -3,17 +3,16 @@ package fyi.manpreet.flowdiary.preview.ui.components.player
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
-import fyi.manpreet.flowdiary.ui.components.player.AudioPlayer
-import fyi.manpreet.flowdiary.ui.components.player.MockAmplitudeData
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import fyi.manpreet.flowdiary.data.model.AmplitudeData
 import fyi.manpreet.flowdiary.preview.DevicePreview
+import fyi.manpreet.flowdiary.preview.MockAmplitudeData
 import fyi.manpreet.flowdiary.ui.components.emotion.EmotionType
+import fyi.manpreet.flowdiary.ui.components.player.AudioPlayer
 import fyi.manpreet.flowdiary.ui.theme.FlowTheme
 import kotlin.time.Duration
 
