@@ -15,12 +15,15 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import co.touchlab.kermit.Logger
 import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.ui.components.player.AudioPlayer
 import fyi.manpreet.flowdiary.ui.home.components.chips.TopicChip
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.theme.spacing
+import fyi.manpreet.flowdiary.util.toHourMinuteString
 import kotlin.time.Duration
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -32,6 +35,10 @@ fun AudioEntryContentItem(
     onAudioPlayerEvent: (HomeEvent.AudioPlayer) -> Unit,
     isPlaying: Boolean,
 ) {
+
+    val createdTime = remember(recording.createdDateInMillis) {
+        recording.createdDateInMillis.toHourMinuteString()
+    }
 
     Card(
         modifier = modifier,
@@ -61,7 +68,7 @@ fun AudioEntryContentItem(
                 )
 
                 Text(
-                    text = "17:30",
+                    text = createdTime,
                     modifier = Modifier.widthIn(min = MaterialTheme.spacing.medium),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,

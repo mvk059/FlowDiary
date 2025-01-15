@@ -75,6 +75,13 @@ fun Duration.formatDuration(): String {
     }
 }
 
+fun Long.toHourMinuteString(): String {
+    val datetime = Instant
+        .fromEpochMilliseconds(this)
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+    return "${datetime.hour.toString().padStart(2, '0')}:${datetime.minute.toString().padStart(2, '0')}"
+}
+
 fun List<Audio>.toRecordingList(): List<Recordings> {
     return this
         .groupBy { audio ->
