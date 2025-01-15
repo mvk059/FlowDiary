@@ -26,6 +26,7 @@ import fyi.manpreet.flowdiary.ui.home.components.empty.HomeScreenEmpty
 import fyi.manpreet.flowdiary.ui.home.components.fab.HomeFab
 import fyi.manpreet.flowdiary.ui.home.components.list.AudioEntryContentItem
 import fyi.manpreet.flowdiary.ui.home.components.list.TimelineItem
+import fyi.manpreet.flowdiary.ui.home.state.AudioDragRecordState
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.home.state.HomeState
 import fyi.manpreet.flowdiary.ui.home.state.PlaybackState
@@ -44,6 +45,7 @@ fun HomeScreen(
 ) {
     val homeState = viewModel.homeState.collectAsStateWithLifecycle()
     val playbackState = viewModel.playbackState.collectAsStateWithLifecycle()
+    val audioDragRecordState = viewModel.audioDragRecordState.collectAsStateWithLifecycle()
     val permissionStatus = viewModel.permissionStatus.collectAsStateWithLifecycle()
     val recordingState = viewModel.recordingState.collectAsStateWithLifecycle()
 
@@ -60,12 +62,14 @@ fun HomeScreen(
         homeState = homeState,
         permissionStatus = permissionStatus,
         recordingState = recordingState,
+        audioDragRecordState = audioDragRecordState,
         playbackState = playbackState,
         onMoodChipItemSelect = viewModel::onEvent,
         onTopicChipItemSelect = viewModel::onEvent,
         onMoodChipReset = viewModel::onEvent,
         onTopicChipReset = viewModel::onEvent,
         onAudioEvent = viewModel::onEvent,
+        onAudioDragRecordEvent = viewModel::onEvent,
         onAudioPlayerEvent = viewModel::onEvent,
         onBottomSheetShow = viewModel::onEvent,
         onSettingsClick = onSettingsClick,
@@ -79,12 +83,14 @@ fun HomeScreenContent(
     homeState: State<HomeState>,
     permissionStatus: State<PermissionState>,
     recordingState: State<RecordingState>,
+    audioDragRecordState: State<AudioDragRecordState>,
     playbackState: State<PlaybackState>,
     onMoodChipItemSelect: (HomeEvent.Chip) -> Unit,
     onTopicChipItemSelect: (HomeEvent.Chip) -> Unit,
     onMoodChipReset: (HomeEvent.Chip) -> Unit,
     onTopicChipReset: (HomeEvent.Chip) -> Unit,
     onAudioEvent: (HomeEvent.AudioRecorder) -> Unit,
+    onAudioDragRecordEvent: (HomeEvent.AudioDragRecorder) -> Unit,
     onAudioPlayerEvent: (HomeEvent.AudioPlayer) -> Unit,
     onBottomSheetShow: (HomeEvent.FabBottomSheet) -> Unit,
     onSettingsClick: () -> Unit,
@@ -95,7 +101,13 @@ fun HomeScreenContent(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = { HomeTopAppBar(onSettingsClick = onSettingsClick) },
-        floatingActionButton = { HomeFab(onFabClick = onBottomSheetShow) },
+        floatingActionButton = {
+            HomeFab(
+                audioDragRecordState = audioDragRecordState.value,
+                onFabClick = onBottomSheetShow,
+                onAudioEvent = onAudioDragRecordEvent
+            )
+        },
     ) { innerPadding ->
         if (homeState.value.recordings.isEmpty()) {
             HomeScreenEmpty(

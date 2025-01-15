@@ -19,6 +19,7 @@ import fyi.manpreet.flowdiary.platform.permission.Permission
 import fyi.manpreet.flowdiary.platform.permission.PermissionState
 import fyi.manpreet.flowdiary.platform.permission.service.PermissionService
 import fyi.manpreet.flowdiary.ui.home.components.chips.FilterOption
+import fyi.manpreet.flowdiary.ui.home.state.AudioDragRecordState
 import fyi.manpreet.flowdiary.ui.home.state.HomeEvent
 import fyi.manpreet.flowdiary.ui.home.state.HomeState
 import fyi.manpreet.flowdiary.ui.home.state.PlaybackState
@@ -76,6 +77,9 @@ class HomeViewModel(
     private val _playbackState = MutableStateFlow(PlaybackState.NotPlaying)
     val playbackState = _playbackState.asStateFlow()
 
+    private val _audioDragRecordState = MutableStateFlow(AudioDragRecordState())
+    val audioDragRecordState = _audioDragRecordState.asStateFlow()
+
     private var originalRecordings: List<Audio> = emptyList()
 
     private var playbackJob: Job? = null
@@ -103,6 +107,14 @@ class HomeViewModel(
             HomeEvent.AudioRecorder.Pause -> onAudioRecordPause()
             HomeEvent.AudioRecorder.Cancel -> onAudioRecordCancel()
             HomeEvent.AudioRecorder.Done -> onAudioRecordDone()
+            HomeEvent.AudioDragRecorder.Record -> onAudioDragRecordStart()
+            is HomeEvent.AudioDragRecorder.Drag -> onAudioDragRecordDragUpdate(
+                event.offsetX,
+                event.isInCancelZone
+            )
+
+            HomeEvent.AudioDragRecorder.Cancel -> onAudioDragRecordCancel()
+            HomeEvent.AudioDragRecorder.Done -> onAudioDragRecordDone()
             is HomeEvent.AudioPlayer.Play -> onPlay(event.id)
             is HomeEvent.AudioPlayer.Pause -> onPause(event.id)
             HomeEvent.Reload -> onReload()
@@ -268,6 +280,24 @@ class HomeViewModel(
         }
     }
 
+    private fun onAudioDragRecordStart() {
+        viewModelScope.launch {
+            _audioDragRecordState.update { it.copy(isDragging = true) }
+            onAudioRecordStart()
+        }
+    }
+
+    private fun onAudioDragRecordDragUpdate(offsetX: Float, isInCancelZone: Boolean) {
+        Logger.i { "onAudioDragRecordDragUpdate isInCancelZone: $isInCancelZone" }
+        _audioDragRecordState.update { state ->
+            state.copy(
+                isDragging = true,
+                dragOffset = offsetX,
+                isInCancelZone = isInCancelZone
+            )
+        }
+    }
+
     private fun updateRecordingState() {
         recordingJob = CoroutineScope(Dispatchers.Main).launch {
             while (isActive) {
@@ -305,6 +335,13 @@ class HomeViewModel(
         onFabBottomSheetHide()
     }
 
+    private fun onAudioDragRecordCancel() {
+        viewModelScope.launch {
+            _audioDragRecordState.update { AudioDragRecordState() }
+            onAudioRecordCancel()
+        }
+    }
+
     private fun onAudioRecordDone() {
         viewModelScope.launch {
             val (filePath, amplitudePath) = audioRecorder.stopRecording()
@@ -322,6 +359,17 @@ class HomeViewModel(
                     amplitudePath = amplitudePath
                 )
             }
+        }
+    }
+
+    private fun onAudioDragRecordDone() {
+        if (_audioDragRecordState.value.isInCancelZone) {
+            onAudioDragRecordCancel()
+            return
+        }
+        viewModelScope.launch {
+            _audioDragRecordState.update { AudioDragRecordState() }
+            onAudioRecordDone()
         }
     }
 

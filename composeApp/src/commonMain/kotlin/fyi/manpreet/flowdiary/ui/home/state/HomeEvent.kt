@@ -23,6 +23,13 @@ sealed interface HomeEvent {
         data object Done : AudioRecorder
     }
 
+    sealed interface AudioDragRecorder : HomeEvent {
+        data object Record : AudioDragRecorder
+        data class Drag(val offsetX: Float, val isInCancelZone: Boolean) : AudioDragRecorder
+        data object Cancel : AudioDragRecorder
+        data object Done : AudioDragRecorder
+    }
+
     sealed interface AudioPlayer : HomeEvent {
         data class Play(val id: Long) : AudioPlayer
         data class Pause(val id: Long) : AudioPlayer
