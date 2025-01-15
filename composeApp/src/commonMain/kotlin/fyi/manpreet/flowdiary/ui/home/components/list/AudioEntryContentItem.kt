@@ -17,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import co.touchlab.kermit.Logger
 import fyi.manpreet.flowdiary.data.model.Audio
 import fyi.manpreet.flowdiary.ui.components.player.AudioPlayer
 import fyi.manpreet.flowdiary.ui.home.components.chips.TopicChip
@@ -33,6 +32,7 @@ fun AudioEntryContentItem(
     recording: Audio,
     currentPosition: Duration,
     onAudioPlayerEvent: (HomeEvent.AudioPlayer) -> Unit,
+    onTopicSelect: (HomeEvent.Chip.TopicSelect) -> Unit,
     isPlaying: Boolean,
 ) {
 
@@ -96,7 +96,10 @@ fun AudioEntryContentItem(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     recording.topics.forEach { topic ->
-                        TopicChip(topic = topic.value)
+                        TopicChip(
+                            topic = topic.value,
+                            onClick = { onTopicSelect(HomeEvent.Chip.TopicSelect(topic)) }
+                        )
                         Spacer(Modifier.width(MaterialTheme.spacing.small))
                     }
                 }

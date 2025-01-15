@@ -95,6 +95,7 @@ class HomeViewModel(
         when (event) {
             is HomeEvent.Chip.MoodChip -> onMoodChipSelect(event.id)
             is HomeEvent.Chip.TopicChip -> onTopicChipSelect(event.id)
+            is HomeEvent.Chip.TopicSelect -> onTopicChipListSelect(event.topic)
             HomeEvent.Chip.MoodReset -> onMoodChipReset()
             HomeEvent.Chip.TopicReset -> onTopicChipReset()
             HomeEvent.FabBottomSheet.FabClick -> viewModelScope.launch { checkPermission() }
@@ -227,6 +228,11 @@ class HomeViewModel(
                 )
             }
         }
+    }
+
+    private fun onTopicChipListSelect(topic: Topic) {
+        val id = topic.value.hashCode()
+        onTopicChipSelect(id)
     }
 
     private fun onMoodChipReset() {

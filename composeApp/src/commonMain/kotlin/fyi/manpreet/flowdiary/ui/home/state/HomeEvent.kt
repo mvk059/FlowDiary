@@ -7,6 +7,7 @@ sealed interface HomeEvent {
         data class TopicChip(val id: Int) : Chip
         data object MoodReset : Chip
         data object TopicReset : Chip
+        data class TopicSelect(val topic: Topic): Chip
     }
 
     sealed interface FabBottomSheet : HomeEvent {

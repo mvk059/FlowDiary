@@ -68,6 +68,7 @@ fun HomeScreen(
         onTopicChipItemSelect = viewModel::onEvent,
         onMoodChipReset = viewModel::onEvent,
         onTopicChipReset = viewModel::onEvent,
+        onTopicSelect = viewModel::onEvent,
         onAudioEvent = viewModel::onEvent,
         onAudioDragRecordEvent = viewModel::onEvent,
         onAudioPlayerEvent = viewModel::onEvent,
@@ -89,6 +90,7 @@ fun HomeScreenContent(
     onTopicChipItemSelect: (HomeEvent.Chip) -> Unit,
     onMoodChipReset: (HomeEvent.Chip) -> Unit,
     onTopicChipReset: (HomeEvent.Chip) -> Unit,
+    onTopicSelect: (HomeEvent.Chip.TopicSelect) -> Unit,
     onAudioEvent: (HomeEvent.AudioRecorder) -> Unit,
     onAudioDragRecordEvent: (HomeEvent.AudioDragRecorder) -> Unit,
     onAudioPlayerEvent: (HomeEvent.AudioPlayer) -> Unit,
@@ -129,7 +131,8 @@ fun HomeScreenContent(
                 onTopicChipItemSelect = onTopicChipItemSelect,
                 onMoodChipReset = onMoodChipReset,
                 onTopicChipReset = onTopicChipReset,
-                onAudioPlayerEvent = onAudioPlayerEvent
+                onAudioPlayerEvent = onAudioPlayerEvent,
+                onTopicSelect = onTopicSelect,
             )
         }
 
@@ -161,6 +164,7 @@ private fun RecordingsList(
     onMoodChipReset: (HomeEvent.Chip) -> Unit,
     onTopicChipReset: (HomeEvent.Chip) -> Unit,
     onAudioPlayerEvent: (HomeEvent.AudioPlayer) -> Unit,
+    onTopicSelect: (HomeEvent.Chip.TopicSelect) -> Unit,
 ) {
     Column(modifier = modifier) {
         FilterScreen(
@@ -200,6 +204,7 @@ private fun RecordingsList(
                                 currentPosition = currentPosition,
                                 isLastIndex = index == recording.recordings.lastIndex,
                                 onAudioPlayerEvent = onAudioPlayerEvent,
+                                onTopicSelect = onTopicSelect,
                             )
                         }
                     }
@@ -235,6 +240,7 @@ private fun AudioItem(
     isLastIndex: Boolean,
     currentPosition: Duration,
     onAudioPlayerEvent: (HomeEvent.AudioPlayer) -> Unit,
+    onTopicSelect: (HomeEvent.Chip.TopicSelect) -> Unit,
 ) {
     TimelineItem(
         emotionType = audio.emotionType,
@@ -245,7 +251,8 @@ private fun AudioItem(
                 recording = audio,
                 currentPosition = currentPosition,
                 isPlaying = isPlaying,
-                onAudioPlayerEvent = onAudioPlayerEvent
+                onAudioPlayerEvent = onAudioPlayerEvent,
+                onTopicSelect = onTopicSelect,
             )
         }
     )

@@ -1,6 +1,7 @@
 package fyi.manpreet.flowdiary.ui.home.components.chips
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
@@ -32,6 +33,7 @@ fun TopicChip(
     modifier: Modifier = Modifier,
     topic: String,
     shouldShowCancel: Boolean = false,
+    onClick: () -> Unit = {},
     onCancel: () -> Unit = {},
 ) {
 
@@ -42,7 +44,8 @@ fun TopicChip(
                 shape = MaterialTheme.shapes.large,
             )
             .heightIn(min = FilterChipDefaults.Height)
-            .padding(horizontal = MaterialTheme.spacing.small),
+            .padding(horizontal = MaterialTheme.spacing.small)
+            .clickable { onClick() },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
