@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -42,12 +43,19 @@ fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
     onNewRecordClick: (AudioPath, String) -> Unit,
     onSettingsClick: () -> Unit,
+    widgetOpenRecord: Boolean = false,
 ) {
     val homeState = viewModel.homeState.collectAsStateWithLifecycle()
     val playbackState = viewModel.playbackState.collectAsStateWithLifecycle()
     val audioDragRecordState = viewModel.audioDragRecordState.collectAsStateWithLifecycle()
     val permissionStatus = viewModel.permissionStatus.collectAsStateWithLifecycle()
     val recordingState = viewModel.recordingState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(widgetOpenRecord) {
+        if (widgetOpenRecord) {
+            viewModel.handleWidgetAction()
+        }
+    }
 
     if (recordingState.value.state == HomeEvent.AudioRecorder.Done) {
         viewModel.onEvent(HomeEvent.AudioRecorder.Idle)

@@ -5,24 +5,35 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-            android:name=".FlowDiaryApp"
-            android:allowBackup="true"
-            android:icon="@drawable/ic_mood"
-            android:label="@string/app_name"
-            android:roundIcon="@drawable/ic_mood"
-            android:supportsRtl="true"
-            android:theme="@style/Theme.App.Starting">
+        android:name=".FlowDiaryApp"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_mood"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/ic_mood"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.App.Starting">
         <activity
-                android:exported="true"
-                android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
-                android:name=".MainActivity"
-                android:theme="@style/Theme.App.Starting">
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
+            android:exported="true"
+            android:theme="@style/Theme.App.Starting">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".ui.widget.FlowDiaryWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/flow_diary_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

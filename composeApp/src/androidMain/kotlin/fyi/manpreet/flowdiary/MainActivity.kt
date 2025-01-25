@@ -10,6 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowInsetsControllerCompat
 import fyi.manpreet.flowdiary.usecase.MainActivityUseCase
+import fyi.manpreet.flowdiary.util.Constants
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 
@@ -25,8 +26,12 @@ class MainActivity : ComponentActivity(), KoinComponent {
         insetsController.isAppearanceLightStatusBars = true
 
         installSplashScreen()
+
+        val widgetOpenRecord = intent.extras?.getBoolean(Constants.WIDGET_RECORD) ?: false
         setContent {
-            App()
+            App(
+                widgetOpenRecord = widgetOpenRecord
+            )
         }
     }
 

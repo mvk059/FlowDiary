@@ -20,6 +20,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun App(
     navController: NavHostController = rememberNavController(),
+    widgetOpenRecord: Boolean = false
 ) {
     FlowTheme {
 
@@ -30,6 +31,7 @@ fun App(
 
             composable<HomeDestination> {
                 HomeScreen(
+                    widgetOpenRecord = widgetOpenRecord,
                     onNewRecordClick = { path, amplitudePath ->
                         navController.navigate(
                             NewRecordDestination(

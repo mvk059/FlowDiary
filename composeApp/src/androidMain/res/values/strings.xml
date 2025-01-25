@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FlowDiary</string>
+    <string name="app_widget_description">Record Audio</string>
 </resources>

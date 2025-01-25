@@ -65,6 +65,9 @@ kotlin {
             implementation(libs.ktor.client.android)
 
             implementation(libs.kstore.file)
+
+            implementation(libs.glance)
+            implementation(libs.glance.material3)
         }
         commonMain.dependencies {
             implementation(compose.runtime)

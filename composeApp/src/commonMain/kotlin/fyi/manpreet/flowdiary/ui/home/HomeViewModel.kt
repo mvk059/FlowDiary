@@ -80,6 +80,7 @@ class HomeViewModel(
     private val _audioDragRecordState = MutableStateFlow(AudioDragRecordState())
     val audioDragRecordState = _audioDragRecordState.asStateFlow()
 
+    private var hasHandledWidgetAction = false
     private var originalRecordings: List<Audio> = emptyList()
 
     private var playbackJob: Job? = null
@@ -126,6 +127,7 @@ class HomeViewModel(
         super.onCleared()
         audioPlayer.release()
         playbackJob?.cancel()
+        hasHandledWidgetAction = false
     }
 
     private fun initHomeState() {
@@ -469,6 +471,13 @@ class HomeViewModel(
 
     private fun openSettingsPage(permission: Permission) {
         permissionService.openSettingsPage(permission)
+    }
+
+    fun handleWidgetAction() {
+        if (!hasHandledWidgetAction) {
+            onEvent(HomeEvent.FabBottomSheet.FabClick)
+            hasHandledWidgetAction = true
+        }
     }
 
     private fun onReload() {
