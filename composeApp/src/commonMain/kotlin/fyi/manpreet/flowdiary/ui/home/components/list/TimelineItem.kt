@@ -38,14 +38,14 @@ fun TimelineItem(
                 )
                 if (isLastItem) return@drawBehind
                 drawLine(
-                    color = Color.LightGray,
+                    color = Color.LightGray.copy(alpha = 0.7f),
                     start = Offset(
                         x = circleRadiusInPxWithPadding,
                         y = (circleRadiusInPx * 2) + 8.dp.toPx()
                     ),
                     end = Offset(
                         x = circleRadiusInPxWithPadding,
-                        y = this.size.height + 8.dp.toPx()
+                        y = this.size.height + 12.dp.toPx()
                     ),
                     strokeWidth = 1.dp.toPx()
                 )
