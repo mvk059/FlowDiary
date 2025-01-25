@@ -2,6 +2,7 @@ package fyi.manpreet.flowdiary.ui.components.player
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
@@ -70,7 +72,8 @@ fun AudioPlayer(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             // Play/Pause Button
             Box(
@@ -106,6 +109,7 @@ fun AudioPlayer(
             ) {
                 Text(
                     text = formattedTime,
+                    modifier = Modifier.width(33.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -116,6 +120,7 @@ fun AudioPlayer(
                 )
                 Text(
                     text = totalDuration.formatDuration(),
+                    modifier = Modifier.width(33.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -198,7 +203,8 @@ fun WaveformSeekbar2(
 
         // Draw the bars with smoother animation
         sampledAmplitudes.forEachIndexed { index, amplitude ->
-            val x = index * (barWidth + spacing)
+            var x = index * (barWidth + spacing)
+            x = if (x == 0f) 0.1f else x
             val barHeight = (amplitude.amplitude * height).coerceIn(1.dp.toPx(), height)
             val y = centerY - (barHeight / 2)
 

@@ -75,7 +75,7 @@ fun HomeFab(
     )
     val secondCircleScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.1f,
+        targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
             animation = tween(1000, delayMillis = 100),
             repeatMode = RepeatMode.Reverse
@@ -95,7 +95,7 @@ fun HomeFab(
             visible = audioDragRecordState.isDragging,
             enter = fadeIn() + scaleIn(),
             exit = fadeOut() + scaleOut(),
-            modifier = Modifier.offset(x = cancelZoneGap, y = 32.dp)
+            modifier = Modifier.offset(x = cancelZoneGap, y = 16.dp)
         ) {
             Box(
                 modifier = Modifier
@@ -117,7 +117,6 @@ fun HomeFab(
                     minWidth = MaterialTheme.spacing.fabContainerWidth,
                     minHeight = MaterialTheme.spacing.fabContainerHeight,
                 )
-                .offset(x = 16.dp, y = 16.dp)
                 .tapAndLongPressDraggable(
                     onTap = { onFabClick(HomeEvent.FabBottomSheet.FabClick) },
                     onDragStart = { onAudioEvent(HomeEvent.AudioDragRecorder.Record) },
@@ -142,15 +141,15 @@ fun HomeFab(
                 if (audioDragRecordState.isDragging) {
                     // Second level circle
                     drawCircle(
-                        color = Color(0xFFEEF0FF),
+                        color = Color(0xFFD9E2FF),
                         radius = (size.minDimension / 1.5f) * secondCircleScale,
-                        alpha = 0.7f
+                        alpha = 0.5f
                     )
                     // First level circle
                     drawCircle(
-                        color = Color(0xFFD9E2FF),
+                        color = Color(0xFF0E5FE0),
                         radius = (size.minDimension / 1.7f) * firstCircleScale,
-                        alpha = 0.9f
+                        alpha = 0.2f
                     )
 
                 }
@@ -165,7 +164,7 @@ fun HomeFab(
             // Icon overlay
             Box(
                 modifier = Modifier
-                    .size(MaterialTheme.spacing.large2XL)
+                    .size(MaterialTheme.spacing.fabContainerWidth)
                     .align(Alignment.Center)
                     .background(Primary60, CircleShape),
                 contentAlignment = Alignment.Center
