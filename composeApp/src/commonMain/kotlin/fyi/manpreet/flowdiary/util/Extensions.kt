@@ -111,7 +111,7 @@ fun formatRelativeDate(date: LocalDate): String {
         today -> "Today"
         yesterday -> "Yesterday"
         else -> "${date.dayOfWeek.toString().lowercase().capitalize()}, ${
-            date.month.toString().take(3)
+            date.month.toString().take(3).lowercase().capitalize()
         } ${date.dayOfMonth}"
     }
 }
