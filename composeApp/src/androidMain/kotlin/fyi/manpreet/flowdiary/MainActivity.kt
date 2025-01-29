@@ -6,6 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowInsetsControllerCompat
@@ -28,6 +30,7 @@ class MainActivity : ComponentActivity(), KoinComponent {
         installSplashScreen()
 
         val widgetOpenRecord = intent.extras?.getBoolean(Constants.WIDGET_RECORD) ?: false
+        window.navigationBarColor = Color(0xFFEEF0FF).toArgb()
         setContent {
             App(
                 widgetOpenRecord = widgetOpenRecord
