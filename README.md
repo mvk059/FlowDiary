@@ -11,7 +11,8 @@
 ## 📱 Functionality
 - Show the list of audio journals based on emotions
 - Transcribe the audio using AI
-- Visualise the amplitude of the audio 
+- Visualise the amplitude of the audio
+- Easily record using a widget
 - Filters for mood and topic
 - Cross platform targetting Android, iOS
 
