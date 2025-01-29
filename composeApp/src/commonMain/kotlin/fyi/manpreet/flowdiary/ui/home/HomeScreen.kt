@@ -119,13 +119,7 @@ fun HomeScreenContent(
             )
         },
     ) { innerPadding ->
-        if (homeState.value.recordings.isEmpty()) {
-            HomeScreenEmpty(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .background(brush = MaterialTheme.gradient.background),
-            )
-        } else {
+
             RecordingsList(
                 modifier = Modifier
                     .fillMaxSize()
@@ -142,7 +136,7 @@ fun HomeScreenContent(
                 onAudioPlayerEvent = onAudioPlayerEvent,
                 onTopicSelect = onTopicSelect,
             )
-        }
+
 
         if (permissionStatus.value == PermissionState.DENIED) {
             PermissionDeniedDialog(
@@ -183,6 +177,13 @@ private fun RecordingsList(
             onMoodChipReset = onMoodChipReset,
             onTopicChipReset = onTopicChipReset,
         )
+
+        if (recordings.isEmpty()) {
+            HomeScreenEmpty(
+                modifier = Modifier.background(brush = MaterialTheme.gradient.background),
+            )
+            return@Column
+        }
 
         LazyColumn {
             recordings.forEach { recording ->
