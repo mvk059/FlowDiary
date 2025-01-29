@@ -242,7 +242,12 @@ class HomeViewModel(
         require(moodChip != null) { "Mood chip can not be null." }
 
         val options = moodChip.options.map { it.copy(isSelected = false) }
-        _homeState.update { state -> state.copy(moodChip = state.moodChip?.copy(options = options)) }
+        _homeState.update { state ->
+            state.copy(
+                moodChip = state.moodChip?.copy(options = options),
+                recordings = originalRecordings.toRecordingList(),
+            )
+        }
     }
 
     private fun onTopicChipReset() {
