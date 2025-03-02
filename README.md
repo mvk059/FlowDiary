@@ -8,6 +8,7 @@
   <h1><img src="https://github.com/user-attachments/assets/2ad85eec-554d-45c0-b7d3-9eca918a3cf5"> Compose Multiplatform app <img src="https://github.com/user-attachments/assets/9a3a5628-3dae-4718-a835-4d78dd20810f"><br />to capture your wonderful thoughts</h1>
 </div>
 
+
 ## 📱 Functionality
 - Show the list of audio journals based on emotions
 - Transcribe the audio using AI
@@ -46,11 +47,11 @@
 ### Android & iOS
 | Listing Screen | Listing Screen |
 | -- | -- |
-| <img src="https://github.com/user-attachments/assets/0c5fc9c9-a928-401c-a107-669405acb2d9" width="270" height="585" />|<img src="https://github.com/user-attachments/assets/2440b1f7-e5b7-4b86-8f07-ef85df3ce3c3" width="270" height="585" />
+| <img src="https://github.com/user-attachments/assets/b718e3a0-72bd-4124-bca5-716df945f9be" width="270" height="585" />|<img src="https://github.com/user-attachments/assets/3e0c80c1-be45-4dbb-8bbc-2f1c54190256" width="270" height="585" />
 
 | Filter Mood | Filter Topic |
 | -- | -- |
-| <img src="https://github.com/user-attachments/assets/1885ea7c-c1ac-44b4-9fd9-579276113af4" width="270" height="585" />|<img src="https://github.com/user-attachments/assets/6648a031-85e9-49d4-b9dc-059b262394e8" width="270" height="585" />
+| <img src="https://github.com/user-attachments/assets/1785213c-012b-4d77-a9d3-1f5ff6aa1189" width="270" height="585" />|<img src="https://github.com/user-attachments/assets/30ca7cca-e862-42b0-befd-879fb0261c6d" width="270" height="585" />
 
 | New Entry Screen | New Entry Screen |
 | -- | -- |
