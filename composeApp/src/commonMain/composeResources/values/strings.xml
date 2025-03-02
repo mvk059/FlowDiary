@@ -8,7 +8,7 @@
     <string name="common_confirm">Confirm</string>
     <string name="common_save">Save</string>
 
-    <string name="home_appbar_title">Your EchoJournal</string>
+    <string name="home_appbar_title">Flow Diary</string>
     <string name="home_empty_title">No Entries</string>
     <string name="home_empty_subtitle">Start recording your first Echo </string>
 
